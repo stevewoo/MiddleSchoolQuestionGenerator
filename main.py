@@ -21,6 +21,8 @@ nltk.download('averaged_perceptron_tagger')
 from nltk import RegexpParser
 import re
 import spacy
+from spacy.matcher import Matcher
+import textacy
 
 # Load English tokenizer, tagger, parser and NER
 nlp = spacy.load("en_core_web_sm")
@@ -29,6 +31,7 @@ file_name = "tectonic_plates.txt"
 
 file_text = open(file_name).read()
 doc = nlp(file_text)
+from spacy.util import filter_spans
 
 sentences = list(doc.sents)
 
@@ -50,6 +53,27 @@ print("Number of sentences in file: " + str(len(sentences)))
 # Analyze syntax
 print("Noun phrases:", [chunk.text for chunk in doc.noun_chunks])
 print("Verbs:", [token.lemma_ for token in doc if token.pos_ == "VERB"])
+
+
+patterns=[{'POS': 'VERB', 'OP': '?'},
+ {'POS': 'ADV', 'OP': '*'},
+ #{'OP': '*'}, # additional wildcard - match any text in between
+ {'POS': 'VERB', 'OP': '+'}]
+
+# instantiate a Matcher instance
+matcher = Matcher(nlp.vocab)
+matcher.add("Verb phrase", [patterns])
+
+# call the matcher to find matches
+matches = matcher(doc)
+spans = [doc[start:end] for _, start, end in matches]
+
+print("Verb phrases: ")
+print(filter_spans(spans))
+
+
+
+
 
 # Find named entities, phrases and concepts
 for entity in doc.ents:
