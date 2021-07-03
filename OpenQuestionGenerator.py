@@ -10,6 +10,9 @@ from spacy.util import filter_spans
 from spacy.matcher import Matcher
 import textacy
 from collections import Counter
+from spacy_wordnet.wordnet_annotator import WordnetAnnotator
+from nltk.corpus import wordnet
+
 
 
 
@@ -27,6 +30,9 @@ class OpenQuestionGenerator:
         file_text = open(file_name).read()
         self.text = file_text
 
+    def load_from_URL(self, URL):
+
+
     def add_question(self, question_text, target_text, sentence_number):
         self.question_list.append((question_text, target_text, sentence_number))
 
@@ -34,13 +40,26 @@ class OpenQuestionGenerator:
 
         print("Tester!")
 
+        # get all synonyms (no domain knowledge)
+        # for syn in wordnet.synsets("good"):
+        #     for name in syn.lemma_names():
+        #         print(name)
+
+        # Load an spacy model (you need to download the spacy pt model)
+        nlp = spacy.load("en_core_web_md")
+
+
+
+
+
+
     def generate_questions(self, number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
         nlp = spacy.load("en_core_web_md")
         doc = nlp(self.text)
 
-        self.add_question("Is this a sample question?", "Sample target", 0)
+        self.add_question("Understand: Is this a sample question?", "Sample target", 0)
 
         sentences = list(doc.sents)
         print("Number of sentences: " + str(len(sentences)))
@@ -87,6 +106,11 @@ class OpenQuestionGenerator:
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number)
 
+
+            # compare / relations - one (with wordnet) # https://pypi.org/project/spacy-wordnet/
+            sentence = self.get_synonyms(nlp, sentence)
+
+            # compare relations - two with nouns
 
             # entity questions
             # extract named entities, phrases and concepts
@@ -135,13 +159,28 @@ class OpenQuestionGenerator:
 
         return self.question_list
 
-
-
-
-
-
-
-
+    def get_synonyms(self, nlp, sentence):
+        if "spacy_wordnet" not in nlp.pipe_names:  # https://blog.dominodatalab.com/natural-language-in-python-using-spacy/
+            nlp.add_pipe("spacy_wordnet", after='tagger', config={'lang': nlp.lang})
+        text = str(sentence)
+        science_domains = ['pure_science', 'applied_science',
+                           'social_science']  # https://wndomains.fbk.eu/hierarchy.html
+        enriched_sentence = []
+        sentence = nlp(text)
+        # For each token in the sentence TODO remove verbs
+        for token in sentence:
+            # We get those synsets within the desired domains
+            synsets = token._.wordnet.wordnet_synsets_for_domain(science_domains)
+            if not synsets:
+                enriched_sentence.append(token.text)
+            else:
+                lemmas_for_synset = [lemma for s in synsets for lemma in s.lemma_names()]
+                # If we found a synset in the economy domains
+                # we get the variants and add them to the enriched sentence
+                enriched_sentence.append('({})'.format('|'.join(set(lemmas_for_synset))))
+        # Let's see our enriched sentence
+        print(' '.join(enriched_sentence))
+        return sentence
 
 
 def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
@@ -192,6 +231,11 @@ def get_hotwords(text, nlp, number_of_hotwords):
     hotwords = [x[0] for x in hotword_counts]
 
     return hotwords
+
+
+#def get_synonyms(word):
+
+
 
 
 
