@@ -14,7 +14,10 @@ if __name__ == '__main__':
     file_name = "tectonic_plates.txt"
     generator.load_text_from_file(file_name)
 
-    generator.generate_questions(3)
+    questions = generator.generate_questions(3)
+
+    for question in questions:
+        print(question)
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 
