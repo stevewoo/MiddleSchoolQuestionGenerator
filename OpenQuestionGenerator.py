@@ -13,6 +13,10 @@ from collections import Counter
 from spacy_wordnet.wordnet_annotator import WordnetAnnotator
 from nltk.corpus import wordnet
 
+import bs4 as bs
+import urllib.request
+import re
+
 
 
 
@@ -30,7 +34,24 @@ class OpenQuestionGenerator:
         file_text = open(file_name).read()
         self.text = file_text
 
-    def load_from_URL(self, URL):
+    def load_from_URL(self, URL): # https://stackabuse.com/text-summarization-with-nltk-in-python
+        scraped_data = urllib.request.urlopen(URL)
+        article = scraped_data.read()
+
+        parsed_article = bs.BeautifulSoup(article,'lxml')
+
+        paragraphs = parsed_article.find_all('p')
+
+        article_text = ""
+
+        for p in paragraphs:
+            article_text += p.text
+
+        # Removing Square Brackets and Extra Spaces
+        article_text = re.sub(r'\[[0-9]*\]', ' ', article_text)
+        article_text = re.sub(r'\s+', ' ', article_text)
+
+        self.text = article_text
 
 
     def add_question(self, question_text, target_text, sentence_number):

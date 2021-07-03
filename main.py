@@ -9,7 +9,10 @@ if __name__ == '__main__':
 
     file_name = "tectonic_plates.txt"
     #file_name = "ferns_and_ants_work_together.txt"
-    generator.load_text_from_file(file_name)
+    #generator.load_text_from_file(file_name)
+
+
+    generator.load_from_URL('https://en.wikipedia.org/wiki/Cat')
 
     questions = generator.generate_questions(3)
 
