@@ -17,6 +17,7 @@ class OpenQuestionGenerator:
 
     def __init__(self):
         self.text = "not set"
+        self.question_list = [] #[(question, target_text, sentence_number)]
 
     def load_text_string(self, text):
         self.text = text
@@ -26,21 +27,27 @@ class OpenQuestionGenerator:
         file_text = open(file_name).read()
         self.text = file_text
 
+    def add_question(self, question_text, target_text, sentence_number):
+        self.question_list.append((question_text, target_text, sentence_number))
+
+    def test_me(self):
+
+        print("Tester!")
+
     def generate_questions(self, number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
-        nlp = spacy.load("en_core_web_sm")
+        nlp = spacy.load("en_core_web_md")
         doc = nlp(self.text)
 
-        question_list = [] #[(question, target_text)]
-        question_list.append(("Is this a sample question?", "Sample target"))
+        self.add_question("Is this a sample question?", "Sample target", 0)
 
         sentences = list(doc.sents)
         print("Number of sentences: " + str(len(sentences)))
 
         # get topic(s)
         print("Hot words:")
-        hot_words = get_hotwords(self.text, nlp, 3)
+        hot_words = get_hotwords(self.text, nlp, 5)
         print(hot_words)
 
 
@@ -49,18 +56,23 @@ class OpenQuestionGenerator:
 
         # generate question for each sentence
 
-        sentences = [sentences[0]]
+        #sentences = [sentences[0]]
 
-        for sentence in sentences:
+
+
+        for sentence_number in range(len(sentences)):
+
+            sentence = sentences[sentence_number]
             print("\n" + str(sentence))
+
+
 
             noun_phrases = [chunk.text for chunk in sentence.noun_chunks]
 
             # for token in sentence:
             #     print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.shape_, token.is_alpha, token.is_stop)
 
-            # extract entities
-            
+
 
             # define main concepts
             for hot_word in hot_words:
@@ -69,10 +81,47 @@ class OpenQuestionGenerator:
                         #print(hot_word + " is found in nounphrase:" + noun_phrase)
                         question = "Understand: How would you define " + str.lower(noun_phrase) + "?"
                         question_target = noun_phrase
-                        question_list.append((question, question_target))
+                        self.add_question(question, question_target, sentence_number)
+
+                        question = "Understand: How would you describe " + str.lower(noun_phrase) + "?"
+                        question_target = noun_phrase
+                        self.add_question(question, question_target, sentence_number)
 
 
-            # location questions
+            # entity questions
+            # extract named entities, phrases and concepts
+            for entity in sentence.ents:
+                print(entity.text, entity.label_)
+
+                # locations
+                if entity.label_ is "LOC":
+                    question = "Remember: Where is " + entity.text + "?"
+                    question_target = entity.text
+                    self.add_question(question, question_target, sentence_number)
+
+                # Persons
+                elif entity.label_ is "PERSON":
+                    question = "Remember: Who is " + entity.text + "?"
+                    question_target = entity.text
+                    self.add_question(question, question_target, sentence_number)
+
+                    question = "Apply: What questions would you ask " + entity.text + "?"
+                    question_target = entity.text
+                    self.add_question(question, question_target, sentence_number)
+
+                # Organisation
+                elif entity.label_ is "ORG":
+                    question = "Understand: What are the goals of " + entity.text + "?"
+                    question_target = entity.text
+                    self.add_question(question, question_target, sentence_number)
+
+
+
+
+
+
+
+
 
 
 
@@ -84,7 +133,14 @@ class OpenQuestionGenerator:
 
 
 
-        return question_list
+        return self.question_list
+
+
+
+
+
+
+
 
 
 
