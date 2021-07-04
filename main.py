@@ -6,7 +6,7 @@ def run():
     # create generator agent
     generator = OpenQuestionGenerator()
 
-    # generator.test_me()
+    # generator.test_me() # for debugging
 
     # load resource
     resource_load_start = perf_counter()

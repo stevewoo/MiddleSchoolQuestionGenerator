@@ -71,3 +71,6 @@ build
 captures
 .externalNativeBuild
 
+# question generator
+*.pyc
+
