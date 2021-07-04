@@ -284,6 +284,10 @@ class OpenQuestionGenerator:
                     question_target = str(sentence)
                     self.add_question(question, question_target, sentence_number, True)
 
+                    question = "Evaluate: What is the evidence supporting this?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
+
         print("Total questions generated: " + str(len(self.question_list)))
 
         #chosen_questions = self.question_list # for debugging
