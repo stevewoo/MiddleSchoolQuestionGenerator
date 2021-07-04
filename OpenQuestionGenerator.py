@@ -8,10 +8,14 @@ import re
 import spacy
 from spacy.util import filter_spans
 from spacy.matcher import Matcher
+from spacy.tokenizer import Tokenizer
+from spacy.attrs import POS
 import textacy
 from collections import Counter
 from spacy_wordnet.wordnet_annotator import WordnetAnnotator
 from nltk.corpus import wordnet
+
+from wordfreq import word_frequency
 
 import bs4 as bs
 import urllib.request
@@ -24,6 +28,7 @@ class OpenQuestionGenerator:
 
     def __init__(self):
         self.text = "not set"
+        self.question_set = set()
         self.question_list = [] #[(question, target_text, sentence_number)]
 
     def load_text_string(self, text):
@@ -55,7 +60,11 @@ class OpenQuestionGenerator:
 
 
     def add_question(self, question_text, target_text, sentence_number):
-        self.question_list.append((question_text, target_text, sentence_number))
+
+        # don't store duplicate questions
+        if question_text not in self.question_set:
+            self.question_set.add(question_text)
+            self.question_list.append((question_text, target_text, sentence_number))
 
     def test_me(self):
 
@@ -79,6 +88,9 @@ class OpenQuestionGenerator:
         # Load English tokenizer, tagger, parser and NER
         nlp = spacy.load("en_core_web_md")
         doc = nlp(self.text)
+        tokenizer = Tokenizer(nlp.vocab)
+
+        vocab_difficulty_threshold = 0.00001
 
         self.add_question("Understand: Is this a sample question?", "Sample target", 0)
 
@@ -96,40 +108,69 @@ class OpenQuestionGenerator:
 
         # generate question for each sentence
 
-        #sentences = [sentences[0]]
+        #sentences = [sentences[0], sentences[1], sentences[2]]
 
 
 
         for sentence_number in range(len(sentences)):
 
             sentence = sentences[sentence_number]
+
+
+
+            sentence_no_stop_no_punct = [token for token in sentence if not (token.is_stop or token.is_punct)]
+            #sentence_no_punct = [token for token in sentence if not token.is_punct]
+            tokens = tokenizer(str(sentence))
+            print("Tokens: " + str(list(tokens)))
             print("\n" + str(sentence))
 
 
 
-            noun_phrases = [chunk.text for chunk in sentence.noun_chunks]
+            noun_phrases = [chunk for chunk in sentence.noun_chunks] # was [chunk.text for chunk in sentence.noun_chunks]
 
             # for token in sentence:
             #     print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.shape_, token.is_alpha, token.is_stop)
 
 
 
-            # define main concepts
+            # define / decribe main concepts
             for hot_word in hot_words:
                 for noun_phrase in noun_phrases:
-                    if hot_word in noun_phrase:
+                    if hot_word in noun_phrase.text:
                         #print(hot_word + " is found in nounphrase:" + noun_phrase)
-                        question = "Understand: How would you define " + str.lower(noun_phrase) + "?"
+                        question = "Understand: How would you define " + str.lower(noun_phrase.text) + "?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number)
 
-                        question = "Understand: How would you describe " + str.lower(noun_phrase) + "?"
+                        question = "Understand: How would you describe " + str.lower(noun_phrase.text) + "?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number)
+
+            # define difficult words
+            difficult_words = []
+
+            for token in sentence_no_stop_no_punct:
+
+                # print(token.text)
+                # print(word_frequency(token.text, 'en'))
+
+                if token.pos_ == "NOUN" or token.pos_ == "VERB" or token.pos_ == "ADJ" or token.pos_ == "ADV":
+                    if word_frequency(token.lemma_, 'en') < vocab_difficulty_threshold:
+
+                        difficult_words.append(token)
+
+            print("Difficult words:")
+            print(difficult_words)
+
+            for token in difficult_words:
+                question = "Understand: What is the meaning of the word \'" + token.text + "\'?"
+                question_target = token.text
+                self.add_question(question, question_target, sentence_number)
+
 
 
             # compare / relations - one (with wordnet) # https://pypi.org/project/spacy-wordnet/
-            sentence = self.get_synonyms(nlp, sentence)
+            #sentence = self.get_synonyms(nlp, sentence)
 
             # compare relations - two with nouns
 
@@ -160,6 +201,23 @@ class OpenQuestionGenerator:
                     question_target = entity.text
                     self.add_question(question, question_target, sentence_number)
 
+            # specific keywords
+
+            # problem / issue / dilemma / crisis
+            problem_keyword = ["problem", "issue", "crisis", "dilemma"]
+
+            #print(get_synonyms("problem"))
+
+            tokens = ["issue", "problem"]
+
+            print("PROBLEMS")
+            problems = filter(lambda item: any(x in item for x in problem_keyword), tokens)
+
+            print(problems)
+
+
+
+
 
 
 
@@ -180,7 +238,7 @@ class OpenQuestionGenerator:
 
         return self.question_list
 
-    def get_synonyms(self, nlp, sentence):
+    def get_context_synonyms_sentence(self, nlp, sentence):
         if "spacy_wordnet" not in nlp.pipe_names:  # https://blog.dominodatalab.com/natural-language-in-python-using-spacy/
             nlp.add_pipe("spacy_wordnet", after='tagger', config={'lang': nlp.lang})
         text = str(sentence)
@@ -254,7 +312,16 @@ def get_hotwords(text, nlp, number_of_hotwords):
     return hotwords
 
 
-#def get_synonyms(word):
+def get_synonyms(word): # get all synonyms (no domain knowledge)
+
+    synonyms = []
+    for syn in wordnet.synsets(word):
+        for name in syn.lemma_names():
+            print(name)
+            synonyms.append(name)
+
+    return synonyms
+
 
 
 
