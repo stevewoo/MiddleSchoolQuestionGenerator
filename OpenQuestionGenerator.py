@@ -96,6 +96,8 @@ class OpenQuestionGenerator:
 
         vocab_difficulty_threshold = 0.00001
 
+
+
         self.add_question("Understand: Is this a sample question?", "Sample target", 0, False)
 
         sentences = list(doc.sents)
@@ -104,7 +106,7 @@ class OpenQuestionGenerator:
         # get topic(s)
         print("Hot words:")
         hot_words = get_hotwords(self.text, nlp, 5)
-        print(hot_words)
+
 
 
         # match questions with most important words
@@ -141,6 +143,7 @@ class OpenQuestionGenerator:
             for hot_word in hot_words:
                 for noun_phrase in noun_phrases:
                     if hot_word in noun_phrase.text:
+
                         #print(hot_word + " is found in nounphrase:" + noun_phrase)
                         question = "Understand: How would you define " + str.lower(noun_phrase.text) + "?"
                         question_target = noun_phrase
@@ -149,6 +152,12 @@ class OpenQuestionGenerator:
                         question = "Understand: How would you describe " + str.lower(noun_phrase.text) + "?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
+
+                        question = "Understand: What does \'" + str.lower(noun_phrase.text) + "\' mean?"
+                        question_target = noun_phrase
+                        self.add_question(question, question_target, sentence_number, False)
+
+
 
             # define difficult words
             difficult_words = []
@@ -169,16 +178,33 @@ class OpenQuestionGenerator:
             # compare / relations - one (with wordnet) # https://pypi.org/project/spacy-wordnet/
             #sentence = self.get_synonyms(nlp, sentence)
 
+            # extract nouns
+            # nouns = []
+            #
+            # for token in sentence: # collect nouns
+            #     if token.pos_ == "NOUN":
+            #         nouns.append(token)
+            #
+            # for hot_word in hot_words:
+            #     for noun_b in nouns:
+            #         if hot_word != noun_b.text:
+            #             question = "Analyse: What is the connection between " + hot_word + " and " + noun_b.text +"?"
+            #             question_target = str(sentence)
+            #             self.add_question(question, question_target, sentence_number, False)
+
+
+
+
+
             # compare relations - two with nouns
 
+
             # entity questions
-            # extract named entities, phrases and concepts
+            # extract named entities: locations, persons, organisations
             org = None
             person = None
 
             for entity in sentence.ents:
-
-
 
                 print(entity.text, entity.label_)
 
@@ -188,9 +214,12 @@ class OpenQuestionGenerator:
                     question_target = entity.text
                     self.add_question(question, question_target, sentence_number, False)
 
+                    question = "Remember: Have you ever been to " + entity.text + "?"
+                    question_target = entity.text
+                    self.add_question(question, question_target, sentence_number, False)
+
                 # Persons
                 elif entity.label_ is "PERSON":
-
 
                     question = "Remember: Who is " + entity.text + "?"
                     question_target = entity.text
@@ -206,16 +235,16 @@ class OpenQuestionGenerator:
                         self.add_question(question, question_target, sentence_number, False)
                         print("parch")
 
-                    if person and person.text != entity.text:
+                    if person and person.text not in entity.text:
                         question = "Analyse: Describe the relationship between " + person.text + " and " + entity.text + "?"
                         question_target = entity.text
                         self.add_question(question, question_target, sentence_number, False)
 
-                    person = entity
+                    person = entity # store for next person / org
 
                 # Organisation
                 elif entity.label_ is "ORG":
-                    org = entity
+
 
                     question = "Understand: What are the goals of " + entity.text + "?"
                     question_target = entity.text
@@ -226,29 +255,66 @@ class OpenQuestionGenerator:
                         question_target = entity.text
                         self.add_question(question, question_target, sentence_number, False)
 
+                    org = entity # store it for next person
+
 
 
             # specific keywords
 
             # problem / issue / dilemma / crisis
-            problem_keyword = ["problem", "issue", "crisis", "dilemma"]
+            problem_keywords = ["problem", "issue", "crisis", "dilemma"]
 
-            #print(get_synonyms("problem"))
+            for word in problem_keywords:
+                if word in str(sentence):
 
-            tokens = ["issue", "problem"]
+                    question = "Create: What would you suggest to solve this?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
 
-            print("PROBLEMS")
-            problems = filter(lambda item: any(x in item for x in problem_keyword), tokens)
+                    question = "Create: What possible solutions do you see here?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
 
-            print(problems)
+                    question = "Create: What changes would you make to solve this?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
 
 
-            # because / due to
+            # desire / want to / trying to
+            if "want" in str(sentence) or "desire" in str(sentence) or "trying to" in str(sentence):
+                question = "Analyse: What could be the motivation here?"
+                question_target = str(sentence)
+                self.add_question(question, question_target, sentence_number, True)
+
+
+            # due to
+            if "due to" in str(sentence):
+                question = "Analyse: What other reasons can you think of?"
+                question_target = str(sentence)
+                self.add_question(question, question_target, sentence_number, True)
+
+            # because
             for token in sentence:
                 lower_token = str.lower(token.text)
                 if lower_token == "because":
-                    question = "Analyse: What other reasons may cause this?"
-                    question_target = None
+                    question = "Analyse: What other reasons can you think of?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
+
+            # opinion language
+            for opinion_phrase in opinion_vocab:
+                if opinion_phrase in str(sentence):
+
+                    question = "Evaluate: Do you believe this? Why or why not?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
+
+                    question = "Evaluate: Is this fact or opinion?"
+                    question_target = str(sentence)
+                    self.add_question(question, question_target, sentence_number, True)
+
+                    question = "Evaluate: How could you verify this?"
+                    question_target = str(sentence)
                     self.add_question(question, question_target, sentence_number, True)
 
 
@@ -279,6 +345,8 @@ class OpenQuestionGenerator:
         chosen_questions = self.question_list # for debugging
 
         chosen_questions = random.sample(self.question_list, number_of_questions)
+
+
 
 
         return chosen_questions
@@ -370,6 +438,8 @@ def get_synonyms(word): # get all synonyms (no domain knowledge)
 
 
 
+
+opinion_vocab = ["opinion", "important", "point of view", "belief", "would say", "impression", "feeling", "doubt", "guess", "conviction", "agree", "disagree", "incorrect", "think", "share the view", "think", "same mind", "one mind", "wrong", "false", "true", "truth", "argument", "debate", "my view", "certain", "convince", "believe", "likely", "unlikely", "generally accepted"]
 
 
 

@@ -12,7 +12,7 @@ if __name__ == '__main__':
     #generator.load_text_from_file(file_name)
 
 
-    generator.load_from_URL('https://simple.wikipedia.org/wiki/hitler')
+    generator.load_from_URL('https://simple.wikipedia.org/wiki/france')
 
     questions = generator.generate_questions(3)
 
