@@ -1,25 +1,36 @@
 from OpenQuestionGenerator import OpenQuestionGenerator
+from time import perf_counter
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+def run():
 
+    # create generator agent
     generator = OpenQuestionGenerator()
 
-    generator.test_me()
+    # generator.test_me()
+
+    # load resource
+    resource_load_start = perf_counter()
 
     file_name = "tectonic_plates.txt"
     #file_name = "ferns_and_ants_work_together.txt"
     #generator.load_text_from_file(file_name)
 
+    generator.load_from_URL('https://simple.wikipedia.org/wiki/cat')
+    resource_load_stop = perf_counter()
+    print("Resource load time:", round(resource_load_stop-resource_load_start, 4), " seconds")
 
-    generator.load_from_URL('https://simple.wikipedia.org/wiki/france')
-
+    # generate questions
+    question_gen_start = perf_counter()
     questions = generator.generate_questions(3)
+    question_gen_stop = perf_counter()
+    print("Question gen time:", round(question_gen_stop-question_gen_start, 4), " seconds")
+
+    # display questions
+
+    print("## Bloom's level: Question ## Target word(s) or sentence ## Sentence number ##")
 
     for question in questions:
         print(question)
 
-
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
-
+if __name__ == '__main__':
+    run()
