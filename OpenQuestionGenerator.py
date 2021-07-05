@@ -181,7 +181,7 @@ class OpenQuestionGenerator:
 
                 #print(entity.text, entity.label_)
                 # locations
-                if entity.label_ is "LOC":
+                if entity.label_ == "LOC":
                     question = "Remember: Where is " + entity.text + "?"
                     question_target = entity.text
                     self.add_question(question, question_target, sentence_number, False)
@@ -191,7 +191,7 @@ class OpenQuestionGenerator:
                     self.add_question(question, question_target, sentence_number, False)
 
                 # Persons
-                elif entity.label_ is "PERSON":
+                elif entity.label_ == "PERSON":
 
                     question = "Remember: Who is " + entity.text + "?"
                     question_target = entity.text
@@ -215,7 +215,7 @@ class OpenQuestionGenerator:
                     person = entity # store for next person / org
 
                 # Organisation
-                elif entity.label_ is "ORG":
+                elif entity.label_ == "ORG":
 
                     question = "Understand: What are the goals of " + entity.text + "?"
                     question_target = entity.text
@@ -290,9 +290,9 @@ class OpenQuestionGenerator:
 
         print("Total questions generated: " + str(len(self.question_list)))
 
-        #chosen_questions = self.question_list # for debugging
+        chosen_questions = self.question_list # for debugging
 
-        chosen_questions = random.sample(self.question_list, number_of_questions)
+        #chosen_questions = random.sample(self.question_list, number_of_questions)
 
         return chosen_questions
 
