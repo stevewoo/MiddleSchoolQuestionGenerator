@@ -16,7 +16,7 @@ def run():
     #file_name = "ferns_and_ants_work_together.txt"
     generator.load_text_from_file(file_name)
 
-    #generator.load_from_URL('https://simple.wikipedia.org/wiki/cat')
+    generator.load_from_URL('https://simple.wikipedia.org/wiki/cats')
     resource_load_stop = perf_counter()
     print("Resource load time:", round(resource_load_stop-resource_load_start, 4), " seconds")
 

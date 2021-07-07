@@ -254,6 +254,12 @@ class OpenQuestionGenerator:
                 question_target = str(sentence)
                 self.add_question(question, question_target, sentence_number, True)
 
+            # solution
+            if "solution" in str(sentence) or "solve" in str(sentence) or "fix" in str(sentence):
+                question = "Evaluate: What are the alternatives?"
+                question_target = str(sentence)
+                self.add_question(question, question_target, sentence_number, True)
+
             # due to
             if "due to" in str(sentence):
                 question = "Analyse: What other reasons can you think of?"
