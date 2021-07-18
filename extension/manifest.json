@@ -10,7 +10,8 @@
         "tabs",
         "storage",
         "activeTab",
-        "scripting"
+        "scripting",
+        "storage"
     ],
     "action":
         { "default_popup": "popup.html" },

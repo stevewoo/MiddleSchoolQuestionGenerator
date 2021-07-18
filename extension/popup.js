@@ -5,8 +5,9 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
   console.log(response);
 
-  document.querySelector('.data') = response.question;
-  //document.querySelector('').innerHTML = response.target;
+  document.querySelector('h1').innerHTML = response.question;
+  document.querySelector('h2').innerHTML = response.target;
+  document.querySelector('strong').innerHTML = response.sentence_number;
 
 
 });

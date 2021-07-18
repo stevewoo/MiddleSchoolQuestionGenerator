@@ -17,6 +17,11 @@ questions = [
      'line_num': 59},
 ]
 
+questions = {'question': 'Create: What changes would you make to solve this?',
+     'target': 'Some birth defects, like heart problems, require urgent vet attention.',
+     'sentence_number': 177}
+
+
 
 @app.route('/', methods=['GET'])
 def home():
@@ -26,4 +31,5 @@ def home():
 def api_all():
     return jsonify(questions)
 
+#app.run(host='127.0.0.1', debug=True, ssl_context=('cert.pem', 'key.pem'))
 app.run()
