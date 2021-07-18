@@ -47,7 +47,11 @@ def api_from_URL():
 
     generator.load_from_URL(str(url))
     questions = generator.generate_questions(1)
-    return jsonify(questions)
+
+    print("Sending question from API:")
+
+    print(questions[0])
+    return jsonify(questions[0])
 
 #app.run(host='127.0.0.1', debug=True, ssl_context=('cert.pem', 'key.pem'))
 app.run()

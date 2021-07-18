@@ -24,6 +24,10 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                     return;
                 }
                 res.json().then(function(data){
+
+//                   result = JSON.parse(data)
+//                    console.log(result);
+
                     response({question: data.question, target: data.target, sentence_number: data.sentence_number});
                 });
             }).catch(function(err) {

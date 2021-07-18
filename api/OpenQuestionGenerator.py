@@ -301,34 +301,37 @@ class OpenQuestionGenerator:
 
         chosen_questions = random.sample(self.question_list, number_of_questions)
 
-        questions_dict = {}
+        questions = []
 
-        # jsonify
+        # make list of dictionaries for json
         for i in range(len(chosen_questions)):
 
             question_dict = {}
 
             question = chosen_questions[i]
 
-            question_dict["question"] = question[0]
-            question_dict["target"] = question[1]
-            question_dict["sentence_number"] = question[2]
+            question_dict['question'] = question[0]
+            question_dict['target'] = question[1]
+            question_dict['sentence_number'] = question[2]
 
             #print(question_dict)
 
-            json_question = json.dumps(str(question_dict))
+            questions.append(question_dict)
 
-            questions_dict[i] = json_question
 
-        #print(questions_dict)
 
-        jsonAll = json.dumps(questions_dict)
+
+        #print(questions)
+
+        jsonAll = json.dumps(str(questions))
 
         # write to file
         with open('data.json', 'w', encoding='utf-8') as file:
-            json.dump(questions_dict, file, ensure_ascii=False, indent=4)
+            json.dump(str(questions), file, ensure_ascii=False, indent=4)
 
-        print(jsonAll)
+        #print(jsonAll)
+
+        chosen_questions = questions
 
         return chosen_questions
 
