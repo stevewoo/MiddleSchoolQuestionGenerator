@@ -1,32 +1,23 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Open Question Generator",
     "version": "1.0",
     "description": "Generate questions based on text",
     "icons": {
         "16": "imgs/icon16.png"
     },
-    "web_accessible_resources": [
-        "imgs/*.jpg",
-        "imgs/*.jpeg"
-    ],
-    "content_scripts": [
-        {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "content.js"
-            ]
-        }
-    ],
     "permissions": [
         "tabs",
-        "<all_urls>",
-        "webRequest",
-        "http://*/*",
-        "https://*/*"
+        "storage",
+        "activeTab",
+        "scripting"
     ],
-    "browser_action":
-        { "default_popup": "popup.html" }
+    "action":
+        { "default_popup": "popup.html" },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ]
 }
