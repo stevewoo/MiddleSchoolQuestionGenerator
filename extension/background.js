@@ -43,6 +43,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                         var question = data.questions[i];
                         console.log(question.question);
                         //response({question: data.questions.question, target: data.target, sentence_number: data.sentence_number});
+                        response(question);
 
                     }
                     console.log(data);
