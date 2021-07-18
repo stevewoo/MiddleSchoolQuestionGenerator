@@ -310,11 +310,15 @@ class OpenQuestionGenerator:
 
             question = chosen_questions[i]
 
-            question_dict['question'] = question[0]
-            question_dict['target'] = question[1]
-            question_dict['sentence_number'] = question[2]
+            question_dict["question"] = str(question[0]).replace("'", '"')
+            question_dict["target"] = str(question[1]).replace("'", '"')
+            #question_dict["sentence_number"] = str("\"" + question[2] + "\"")
 
-            #print(question_dict)
+            # question_dict["question"] = question[0]
+            # question_dict["target"] = question[1]
+            question_dict["sentence_number"] = question[2]
+
+            print(question_dict)
 
             questions.append(question_dict)
 

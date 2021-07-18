@@ -2,6 +2,19 @@
 
 const server = "http://127.0.0.1:5000/";
 
+var questions = [];
+
+function showQuestions() {
+//  var temperatures = [59.2, 60.1, 63, 65, 62].map(function (t, i) {
+//    return 'The temperature at ' + (i || 'noon') + ' was ' + t
+//  })
+
+    // from https://stackoverflow.com/questions/43567079/simpler-way-to-print-array-items-into-list-items-javascript
+    document.getElementById('questions').innerHTML =
+    '<li>' + questions.join('</li><li>') + '</li>';
+}
+
+
 // listen for messages
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
 
@@ -25,10 +38,16 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                 }
                 res.json().then(function(data){
 
-//                   result = JSON.parse(data)
-//                    console.log(result);
+//                    var jsonData = JSON.parse(data);
+                    for (var i = 0; i < data.questions.length; i++) {
+                        var question = data.questions[i];
+                        console.log(question.question);
+                        //response({question: data.questions.question, target: data.target, sentence_number: data.sentence_number});
 
-                    response({question: data.question, target: data.target, sentence_number: data.sentence_number});
+                    }
+                    console.log(data);
+
+                    //showQuestions();
                 });
             }).catch(function(err) {
                 response({question: 'Error - no question', target: "Error - no target", sentence_number: "Error - no sentence number"});

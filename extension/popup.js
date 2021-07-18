@@ -9,5 +9,7 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
   document.querySelector('h2').innerHTML = response.target;
   document.querySelector('strong').innerHTML = response.sentence_number;
 
+  chrome.tabs.executeScript(null, { file: "content.js" });
+
 
 });

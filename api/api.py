@@ -46,12 +46,16 @@ def api_from_URL():
     print("Received: " + str(url))
 
     generator.load_from_URL(str(url))
-    questions = generator.generate_questions(1)
+    questions = generator.generate_questions(3)
 
-    print("Sending question from API:")
 
-    print(questions[0])
-    return jsonify(questions[0])
+    dict = { "questions": questions }
+    print(dict)
+
+    print("Sending dict from API...")
+
+    #print(questions[0])
+    return jsonify(dict)
 
 #app.run(host='127.0.0.1', debug=True, ssl_context=('cert.pem', 'key.pem'))
 app.run()
