@@ -1,0 +1,7 @@
+{
+    "0": "\"{'question': 'Understand: How would you explain their cats?', 'target': their cats, 'sentence_number': 141}\"",
+    "1": "\"{'question': 'Understand: How would you describe communication?', 'target': communication, 'sentence_number': 62}\"",
+    "2": "\"{'question': \\\"Understand: What is the meaning of the word 'poly'?\\\", 'target': 'poly', 'sentence_number': 179}\"",
+    "3": "\"{'question': \\\"Understand: What is the meaning of the word 'woodland'?\\\", 'target': 'woodland', 'sentence_number': 50}\"",
+    "4": "\"{'question': 'Analyse: What other reasons can you think of?', 'target': 'Cats cannot taste sweet foods (with sugar) because of a mutation (change) in their ancestors which removed the ability to taste sweet things.', 'sentence_number': 27}\""
+}

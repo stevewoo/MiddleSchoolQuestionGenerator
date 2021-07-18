@@ -12,11 +12,11 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
 
             let url = tabs[0].url; // use `url` here inside the callback because it's asynchronous!
 
-            const apiCall = server + "api/test_sentences?" + url;
+            const apiCall = server + "api/get_sentences?url=" + url;
 
             console.log(apiCall);
-//
-//            // call api
+
+            // call api
             fetch(apiCall).then(function(res){
 
                 if  (res.status !== 200){

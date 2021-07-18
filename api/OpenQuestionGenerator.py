@@ -38,7 +38,7 @@ class OpenQuestionGenerator:
         self.text = file_text
 
     def load_from_URL(self, URL): # from https://stackabuse.com/text-summarization-with-nltk-in-python
-        print("Loading from URL: " + URL)
+        print("Loading from URL: " + str(URL))
 
         scraped_data = urllib.request.urlopen(URL)
         article = scraped_data.read()
