@@ -22,7 +22,7 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         var question = question_object.question;
         var sentence_number = question_object.sentence_number;
-        var target = question_object.target.replace(/['"]+/g, ''));;
+        var target = question_object.target;//.replace(/^["'](.+(?=["']$))["']$/, '$1');
 
         console.log(question);
 
@@ -42,10 +42,18 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
         for (let j = 0; j < text.length; j++) {
             let tag = text[j].tagName;
             if (text[j].innerHTML.match(target) && !(tag == "BUTTON" || tag == "SPAN")){
-                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark>"+target+"</mark>");
+                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark><div class=\"tooltip\">"+target+"<span class=\"tooltiptext\">Tooltip text</span></div></mark>");
             }
 
         }
+
+        /*
+
+        <div class="tooltip">Hover over me
+            <span class="tooltiptext">Tooltip text</span>
+         </div>
+
+        */
 
 
         //console.log(el.innerText);
