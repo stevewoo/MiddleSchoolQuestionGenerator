@@ -20,7 +20,7 @@
   position: absolute;
   z-index: 1;
   bottom: 125%;
-  left: 105%;
+  left: 50%;
   margin-left: -60px;
 
   /* Fade in tooltip */

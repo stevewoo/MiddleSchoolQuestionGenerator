@@ -39,10 +39,12 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         text = document.querySelectorAll("p");
 
+        tooltip_text = question
+
         for (let j = 0; j < text.length; j++) {
             let tag = text[j].tagName;
             if (text[j].innerHTML.match(target) && !(tag == "BUTTON" || tag == "SPAN")){
-                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark><div class=\"tooltip\">"+target+"<span class=\"tooltiptext\">Tooltip text</span></div></mark>");
+                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark><div class=\"tooltip\">"+target+"<span class=\"tooltiptext\">" + tooltip_text + "</span></div></mark>");
             }
 
         }
