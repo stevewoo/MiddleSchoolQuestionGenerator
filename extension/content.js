@@ -1,5 +1,5 @@
 // from https://github.com/btahir/summarlight/blob/master/extension_bundle/content.js
-alert("Generating questions...");
+//alert("Generating questions...");
 
 function unicodeToChar(text) {
 	return text.replace(/\\u[\dA-F]{4}/gi,
@@ -22,10 +22,24 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
     // for each value
 
-    value = "Kiwi"
+    for
 
-    value = unicodeToChar(value).replace(/\\n/g, '');
-    document.body.innerHTML = document.body.innerHTML.split(value).join('<span style="background-color: #fff799;">' + value + '</span>');
+    value = "the";
+
+    //highlight(value);
+
+    //value = unicodeToChar(value).replace(/\\n/g, '');
+    //document.body.innerHTML = document.body.innerHTML.split(value).join('<span style="background-color: #fff799;">' + value + '</span>');
+
+    var el = document.body; // getElementById('mytext');
+
+    text = el.innerHTML;
+
+    keyword = value; //document.getElementById('input').value;
+
+    marked = text.replace(new RegExp(keyword, 'g'),"<mark>"+keyword+"</mark>");
+
+    el.innerHTML = marked;
 
 
 
