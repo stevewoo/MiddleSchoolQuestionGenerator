@@ -38,14 +38,15 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
                 }
                 res.json().then(function(data){
 
-//                    var jsonData = JSON.parse(data);
-                    for (var i = 0; i < data.questions.length; i++) {
-                        var question = data.questions[i];
-                        console.log(question.question);
-                        //response({question: data.questions.question, target: data.target, sentence_number: data.sentence_number});
-                        response(question);
+                    response(data);
 
-                    }
+//                    var jsonData = JSON.parse(data);
+
+                        //response({question: data.questions.question, target: data.target, sentence_number: data.sentence_number});
+
+
+
+
                     console.log(data);
 
                     //showQuestions();

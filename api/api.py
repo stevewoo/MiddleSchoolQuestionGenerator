@@ -7,8 +7,7 @@ from OpenQuestionGenerator import OpenQuestionGenerator
 app = flask.Flask(__name__) # Flask application object
 app.config["DEBUG"] = True
 
-# create generator agent
-generator = OpenQuestionGenerator()
+
 
 # test data
 questions = [
@@ -39,6 +38,9 @@ def api_all():
 
 @app.route('/api/get_sentences', methods=['GET'])
 def api_from_URL():
+
+    # create generator agent
+    generator = OpenQuestionGenerator() # recreating as storing old questions
 
     url = request.args.get("url")
     print(url)

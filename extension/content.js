@@ -1,12 +1,6 @@
 // from https://github.com/btahir/summarlight/blob/master/extension_bundle/content.js
 //alert("Generating questions...");
 
-function unicodeToChar(text) {
-	return text.replace(/\\u[\dA-F]{4}/gi,
-	      function (match) {
-	           return String.fromCharCode(parseInt(match.replace(/\\u/g, ''), 16));
-	      });
-}
 
 // send message To Background
 chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
@@ -22,27 +16,48 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
     // for each value
 
-    for
+    for (var i = 0; i < response.questions.length; i++) {
 
-    value = "the";
+        var question_object = response.questions[i];
 
-    //highlight(value);
+        var question = question_object.question;
+        var sentence_number = question_object.sentence_number;
+        var target = question_object.target.replace(/['"]+/g, ''));;
 
-    //value = unicodeToChar(value).replace(/\\n/g, '');
-    //document.body.innerHTML = document.body.innerHTML.split(value).join('<span style="background-color: #fff799;">' + value + '</span>');
+        console.log(question);
 
-    var el = document.body; // getElementById('mytext');
+        //value = target;
 
-    text = el.innerHTML;
+        //highlight(value);
 
-    keyword = value; //document.getElementById('input').value;
+        //value = unicodeToChar(value).replace(/\\n/g, '');
+        //document.body.innerHTML = document.body.innerHTML.split(value).join('<span style="background-color: #fff799;">' + value + '</span>');
 
-    marked = text.replace(new RegExp(keyword, 'g'),"<mark>"+keyword+"</mark>");
+        var el = document.body; // getElementById('mytext');
 
-    el.innerHTML = marked;
+        // text = el.innerHTML;
+
+        text = document.querySelectorAll("p");
+
+        for (let j = 0; j < text.length; j++) {
+            let tag = text[j].tagName;
+            if (text[j].innerHTML.match(target) && !(tag == "BUTTON" || tag == "SPAN")){
+                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark>"+target+"</mark>");
+            }
+
+        }
 
 
+        //console.log(el.innerText);
 
+        //keyword = value; //document.getElementById('input').value;
+
+        //marked = text.replace(new RegExp(keyword, 'g'),"<mark>"+keyword+"</mark>");
+
+        //el.innerHTML = marked;
+
+
+    }
 
 
 });
