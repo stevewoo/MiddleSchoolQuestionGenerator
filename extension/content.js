@@ -59,18 +59,19 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
             p_text = text[j].innerText;
             // console.log(p_text);
 
-            p_text = p_text.replace(/[[0-9]+]+/g, "");
+            p_text = p_text.replace(/[[0-9]+]+/g, ""); // remove wiki references
+            //p_text = p_text.lower();
 
             // console.log(p_text); // after reference removal
 
-            if (text[j].innerText.includes(target)){
+            if (p_text.toLowerCase().includes(target.toLowerCase())){
 
 
 
                 //var pattern = new RegExp(target, 'gi')
                 text[j].innerHTML = text[j].innerHTML.replace(target, "<mark><div class='tooltip'>"
                 + target + "<span class='tooltiptext'>"
-                + tooltip_text + "</span></div></mark>");
+                + tooltip_text + "</div></mark></span>");
             }
 
 
