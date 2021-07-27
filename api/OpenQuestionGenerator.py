@@ -124,19 +124,19 @@ class OpenQuestionGenerator:
                     if hot_word in noun_phrase.text:
 
                         #print(hot_word + " is found in nounphrase:" + noun_phrase)
-                        question = "Understand: How would you define " + str.lower(noun_phrase.text) + "?"
+                        question = "Understand: How would you define `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
-                        question = "Understand: How would you describe " + str.lower(noun_phrase.text) + "?"
+                        question = "Understand: How would you describe `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
-                        question = "Understand: How would you explain " + str.lower(noun_phrase.text) + "?"
+                        question = "Understand: How would you explain `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
-                        question = "Understand: What does \'" + str.lower(noun_phrase.text) + "\' mean?"
+                        question = "Understand: What does `" + noun_phrase.text + "` mean?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
@@ -152,7 +152,7 @@ class OpenQuestionGenerator:
             # print("Difficult words:")
             # print(difficult_words)
             for token in difficult_words:
-                question = "Understand: What is the meaning of the word \'" + token.text + "\'?"
+                question = "Understand: What is the meaning of the word " + token.text + "?"
                 question_target = token.text
                 self.add_question(question, question_target, sentence_number, False)
 
@@ -310,8 +310,8 @@ class OpenQuestionGenerator:
 
             question = chosen_questions[i]
 
-            question_dict["question"] = str(question[0]).replace("'", '"')
-            question_dict["target"] = str(question[1]).replace("'", '"')
+            question_dict["question"] = str(question[0])#.replace("'", '"')
+            question_dict["target"] = str(question[1])#.replace("'", '"')
             #question_dict["sentence_number"] = str("\"" + question[2] + "\"")
 
             # question_dict["question"] = question[0]
@@ -327,11 +327,11 @@ class OpenQuestionGenerator:
 
         #print(questions)
 
-        jsonAll = json.dumps(str(questions))
+        #jsonAll = json.dumps(str(questions))
 
         # write to file
-        with open('data.json', 'w', encoding='utf-8') as file:
-            json.dump(str(questions), file, ensure_ascii=False, indent=4)
+        # with open('data.json', 'w', encoding='utf-8') as file:
+        #     json.dump(str(questions), file, ensure_ascii=False, indent=4)
 
         #print(jsonAll)
 

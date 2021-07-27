@@ -16,6 +16,16 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
     // for each value
 
+//    var el = document.body;
+//    text = document.querySelectorAll("p");
+//    console.log(text);
+
+//    for (let k = 0; k < text.length; k++) {
+//
+//            console.log(k + text[k]);
+//    }
+
+
     for (var i = 0; i < response.questions.length; i++) {
 
         var question_object = response.questions[i];
@@ -39,13 +49,35 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         text = document.querySelectorAll("p");
 
-        tooltip_text = question
+
+
+        tooltip_text = question;
 
         for (let j = 0; j < text.length; j++) {
             let tag = text[j].tagName;
-            if (text[j].innerHTML.match(target) && !(tag == "BUTTON" || tag == "SPAN")){
-                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark><div class=\"tooltip\">"+target+"<span class=\"tooltiptext\">" + tooltip_text + "</span></div></mark>");
+
+            p_text = text[j].innerText;
+            // console.log(p_text);
+
+            p_text = p_text.replace(/[[0-9]+]+/g, "");
+
+            // console.log(p_text); // after reference removal
+
+            if (text[j].innerText.includes(target)){
+
+
+
+                //var pattern = new RegExp(target, 'gi')
+                text[j].innerHTML = text[j].innerHTML.replace(target, "<mark><div class='tooltip'>"
+                + target + "<span class='tooltiptext'>"
+                + tooltip_text + "</span></div></mark>");
             }
+
+
+            // working ok for small phrases
+//            if (text[j].innerHTML.match(target) && !(tag == "BUTTON" || tag == "SPAN")){
+//                text[j].innerHTML = text[j].innerHTML.replace(new RegExp(target, 'g'),"<mark><div class=\"tooltip\">"+target+"<span class=\"tooltiptext\">" + tooltip_text + "</span></div></mark>");
+//            }
 
         }
 
