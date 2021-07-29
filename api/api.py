@@ -49,7 +49,7 @@ def api_from_URL():
 
     generator.load_from_URL(str(url))
 
-    questions = generator.generate_questions(25)
+    questions = generator.generate_questions(40)
 
     dict = { "questions": questions }
     print(dict)

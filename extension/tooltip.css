@@ -1,15 +1,12 @@
 /* http://www.menucool.com/tooltip/css-tooltip */
 
 .tooltip {
-<<<<<<< HEAD
+
     display:inline-block;
     position:relative;
     text-align:left;
-=======
-  position: relative;
-  display: inline-block;
   /* border-bottom: 1px dotted black; If you want dots under the hoverable text */
->>>>>>> 3899fb89b4fca2da5aa6e9d5d8d54c9d616610f3
+
 }
 
 .tooltip h3 {margin:12px 0;}

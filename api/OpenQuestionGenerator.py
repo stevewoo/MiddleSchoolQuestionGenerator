@@ -51,7 +51,7 @@ class OpenQuestionGenerator:
 
         parsed_article = bs.BeautifulSoup(article,'lxml')
 
-        paragraphs = parsed_article.find_all('p')
+        paragraphs = parsed_article.find_all('section')
 
         article_text = ""
 
@@ -353,13 +353,13 @@ class OpenQuestionGenerator:
 
         for question in self.question_list:
 
-            if question[3] == 1 and remember_questions < max_questions_per_bloom_level:
+            if question[3] == 1 and remember_questions < 5:
                 remember_questions += 1
                 spread_questions.append(question)
             elif question[3] == 2 and understand_questions < max_questions_per_bloom_level:
                 understand_questions += 1
                 spread_questions.append(question)
-            elif question[3] == 2.5 and understand_hf_questions < max_questions_per_bloom_level:
+            elif question[3] == 2.5 and understand_hf_questions < 15:
                 understand_hf_questions += 1
                 spread_questions.append(question)
             elif question[3] == 3 and apply_questions < max_questions_per_bloom_level:

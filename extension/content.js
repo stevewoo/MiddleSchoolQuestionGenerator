@@ -60,10 +60,10 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         // text = el.innerHTML;
 
-        text = document.querySelectorAll("p");
+        text = document.querySelectorAll("section");
 
 
-        tooltip_text = "<h3>"+ bloom_level +"</h3>" + question;
+        tooltip_text = "<div><strong>"+ bloom_level +"</strong></div>" + question;
 
         /*
         <div class="tooltip">
@@ -105,9 +105,9 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
 
                 //var pattern = new RegExp(target, 'gi')
-                text[j].innerHTML = text[j].innerHTML.replace(target, "<div class='tooltip'><mark>"
+                text[j].innerHTML = text[j].innerHTML.replace(target, "<span class='tooltip'><mark>"
                 + target + "</mark><span class='right'><span class='text-content'>"
-                + tooltip_text + "</span><i></i></span></div>");
+                + tooltip_text + "</span><i></i></span></span>");
 
 
             }
