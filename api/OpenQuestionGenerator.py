@@ -338,6 +338,8 @@ class OpenQuestionGenerator:
 
         print("Total questions generated: " + str(len(self.question_list)))
 
+        random.shuffle(self.question_list)
+
         # try to even out bloom_levels
         remember_questions = 0
         understand_questions = 0
@@ -349,7 +351,7 @@ class OpenQuestionGenerator:
 
         max_questions_per_bloom_level = 10
 
-        spread_questions  = []
+        spread_questions = []
 
         for question in self.question_list:
 
