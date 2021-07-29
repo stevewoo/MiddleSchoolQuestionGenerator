@@ -185,7 +185,11 @@ class OpenQuestionGenerator:
             # print("Difficult words:")
             # print(difficult_words)
             for token in difficult_words:
+<<<<<<< HEAD
                 question = "Understand: What is the meaning of the word '" + token.text + "'?"
+=======
+                question = "Understand: What is the meaning of the word " + token.text + "?"
+>>>>>>> 3899fb89b4fca2da5aa6e9d5d8d54c9d616610f3
                 question_target = token.text
                 self.add_question(2, question, question_target, sentence_number, False)
 
