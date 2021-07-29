@@ -20,6 +20,7 @@ import bs4 as bs
 import urllib.request
 import re
 import json
+from transformers import T5Config, T5ForConditionalGeneration, T5Tokenizer
 
 class OpenQuestionGenerator:
 
@@ -27,6 +28,11 @@ class OpenQuestionGenerator:
         self.text = "not set"
         self.question_set = set()
         self.question_list = [] #[(question, target_text, sentence_number, allow_duplicate)]
+
+        # setup question gen model
+        model_name = "allenai/t5-small-squad2-question-generation"
+        self.tokenizer = T5Tokenizer.from_pretrained(model_name)
+        self.model = T5ForConditionalGeneration.from_pretrained(model_name)
 
     def load_text_from_string(self, text):
         self.text = text
@@ -75,6 +81,9 @@ class OpenQuestionGenerator:
 
         print("Tester!")
 
+
+
+
         # get all synonyms (no domain knowledge)
         # for syn in wordnet.synsets("good"):
         #     for name in syn.lemma_names():
@@ -82,6 +91,13 @@ class OpenQuestionGenerator:
 
         # Load an spacy model (you need to download the spacy pt model)
         #nlp = spacy.load("en_core_web_md")
+
+    def run_model(self, input_string, **generator_args):
+        input_ids = self.tokenizer.encode(input_string, return_tensors="pt")
+        res = self.model.generate(input_ids, **generator_args)
+        output = self.tokenizer.batch_decode(res, skip_special_tokens=True)
+        #print(output)
+        return(output)
 
     def generate_questions(self, number_of_questions):
 
@@ -91,6 +107,8 @@ class OpenQuestionGenerator:
         tokenizer = Tokenizer(nlp.vocab)
 
         vocab_difficulty_threshold = 0.000007
+
+
 
         #self.add_question("Understand: Is this a sample question?", "Sample target", 0, False)
 
@@ -113,6 +131,24 @@ class OpenQuestionGenerator:
             #print("Tokens: " + str(list(tokens)))
             #print("\n" + str(sentence))
 
+
+            # only do every n sentence to improve speed
+            # ai question generator from
+            # https://huggingface.co/allenai/t5-small-squad2-question-generation/blob/main/README.md
+            if sentence_number % 10 == 0:
+
+                print("Hugging face:")
+
+                # remove brackets
+                #sentence = sentence.replace('(','').replace(')','')
+                print(sentence)
+                question = self.run_model(str(sentence))
+
+                question = "Understand: " + question[0] # is this safe?
+                print(question)
+                question_target = str(sentence)
+                self.add_question(question, question_target, sentence_number, False)
+
             noun_phrases = [chunk for chunk in sentence.noun_chunks] # was [chunk.text for chunk in sentence.noun_chunks]
 
             # for token in sentence:
@@ -124,19 +160,19 @@ class OpenQuestionGenerator:
                     if hot_word in noun_phrase.text:
 
                         #print(hot_word + " is found in nounphrase:" + noun_phrase)
-                        question = "Understand: How would you define " + str.lower(noun_phrase.text) + "?"
+                        question = "Understand: How would you define `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
-                        question = "Understand: How would you describe " + str.lower(noun_phrase.text) + "?"
+                        question = "Understand: How would you describe `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
-                        question = "Understand: How would you explain " + str.lower(noun_phrase.text) + "?"
+                        question = "Understand: How would you explain `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
-                        question = "Understand: What does \'" + str.lower(noun_phrase.text) + "\' mean?"
+                        question = "Understand: What does `" + noun_phrase.text + "` mean?"
                         question_target = noun_phrase
                         self.add_question(question, question_target, sentence_number, False)
 
@@ -152,7 +188,7 @@ class OpenQuestionGenerator:
             # print("Difficult words:")
             # print(difficult_words)
             for token in difficult_words:
-                question = "Understand: What is the meaning of the word \'" + token.text + "\'?"
+                question = "Understand: What is the meaning of the word " + token.text + "?"
                 question_target = token.text
                 self.add_question(question, question_target, sentence_number, False)
 
@@ -303,33 +339,39 @@ class OpenQuestionGenerator:
 
         questions = []
 
-        # jsonify
+        # make list of dictionaries for json
         for i in range(len(chosen_questions)):
 
             question_dict = {}
 
             question = chosen_questions[i]
 
-            question_dict['question'] = question[0]
-            question_dict['target'] = question[1]
-            question_dict['sentence_number'] = question[2]
+            question_dict["question"] = str(question[0])#.replace("'", '"')
+            question_dict["target"] = str(question[1])#.replace("'", '"')
+            #question_dict["sentence_number"] = str("\"" + question[2] + "\"")
 
-            #print(question_dict)
+            # question_dict["question"] = question[0]
+            # question_dict["target"] = question[1]
+            question_dict["sentence_number"] = question[2]
+
+            print(question_dict)
 
             questions.append(question_dict)
 
 
 
 
-        print(questions)
+        #print(questions)
 
-        jsonAll = json.dumps(str(questions))
+        #jsonAll = json.dumps(str(questions))
 
         # write to file
-        with open('data.json', 'w', encoding='utf-8') as file:
-            json.dump(str(questions), file, ensure_ascii=False, indent=4)
+        # with open('data.json', 'w', encoding='utf-8') as file:
+        #     json.dump(str(questions), file, ensure_ascii=False, indent=4)
 
-        print(jsonAll)
+        #print(jsonAll)
+
+        chosen_questions = questions
 
         return chosen_questions
 

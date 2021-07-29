@@ -24,7 +24,8 @@
     "content_scripts": [
         {
             "matches": [
-                "*://*.wikipedia.org/*"
+                "*://*.wikipedia.org/*",
+                "*://*.repl.co/"
             ],
             "js": [
                 "content.js"

@@ -73,4 +73,6 @@ captures
 
 # question generator
 *.pyc
+*.dylib
 
+/venv/lib/python3.9/site-packages/torch/lib/
