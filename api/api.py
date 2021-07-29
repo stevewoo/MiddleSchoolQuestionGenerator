@@ -48,12 +48,8 @@ def api_from_URL():
     print("Received: " + str(url))
 
     generator.load_from_URL(str(url))
-<<<<<<< HEAD
-    questions = generator.generate_questions(25)
-=======
-    questions = generator.generate_questions(50)
->>>>>>> 3899fb89b4fca2da5aa6e9d5d8d54c9d616610f3
 
+    questions = generator.generate_questions(25)
 
     dict = { "questions": questions }
     print(dict)

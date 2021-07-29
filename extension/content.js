@@ -24,13 +24,8 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 //
 //            console.log(k + text[k]);
 //    }
-
-
-<<<<<<< HEAD
     var previously_targetted = []
 
-=======
->>>>>>> 3899fb89b4fca2da5aa6e9d5d8d54c9d616610f3
     for (var i = 0; i < response.questions.length; i++) {
 
         var question_object = response.questions[i];
@@ -67,7 +62,7 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         text = document.querySelectorAll("p");
 
-<<<<<<< HEAD
+
         tooltip_text = "<h3>"+ bloom_level +"</h3>" + question;
 
         /*
@@ -91,11 +86,8 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
         // tooltip_text = question;
 
 
-=======
 
 
-        tooltip_text = question;
->>>>>>> 3899fb89b4fca2da5aa6e9d5d8d54c9d616610f3
 
         for (let j = 0; j < text.length; j++) {
             let tag = text[j].tagName;
@@ -113,15 +105,11 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
 
                 //var pattern = new RegExp(target, 'gi')
-<<<<<<< HEAD
-                text[j].innerHTML = text[j].innerHTML.replace(target, "<span class='tooltip'><mark>"
+                text[j].innerHTML = text[j].innerHTML.replace(target, "<div class='tooltip'><mark>"
                 + target + "</mark><span class='right'><span class='text-content'>"
-                + tooltip_text + "</span><i></i></span></span>");
-=======
-                text[j].innerHTML = text[j].innerHTML.replace(target, "<mark><div class='tooltip'>"
-                + target + "<span class='tooltiptext'>"
-                + tooltip_text + "</div></mark></span>");
->>>>>>> 3899fb89b4fca2da5aa6e9d5d8d54c9d616610f3
+                + tooltip_text + "</span><i></i></span></div>");
+
+
             }
 
 
