@@ -90,7 +90,7 @@ class OpenQuestionGenerator:
         return(output)
 
     #
-    def generate_questions(self, number_of_questions):
+    def generate_questions(self, max_number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
         nlp = spacy.load("en_core_web_md")
@@ -102,6 +102,12 @@ class OpenQuestionGenerator:
 
         sentences = list(doc.sents)
         print("Number of sentences: " + str(len(sentences)))
+
+        optimal_number_of_questions = round(len(sentences)/5)
+
+        if optimal_number_of_questions > max_number_of_questions:
+            optimal_number_of_questions = max_number_of_questions
+
 
         # get topic(s)
         print("Hot words:")
@@ -320,19 +326,19 @@ class OpenQuestionGenerator:
         evaluate_questions = 0
         create_questions = 0
 
-        max_questions_per_bloom_level = 10
+        max_questions_per_bloom_level = round(optimal_number_of_questions / 7)
 
         spread_questions = []
 
         for question in self.question_list:
 
-            if question[3] == 1 and remember_questions < 5:
+            if question[3] == 1 and remember_questions < max_questions_per_bloom_level:
                 remember_questions += 1
                 spread_questions.append(question)
             elif question[3] == 2 and understand_questions < max_questions_per_bloom_level:
                 understand_questions += 1
                 spread_questions.append(question)
-            elif question[3] == 2.5 and understand_hf_questions < 10:
+            elif question[3] == 2.5 and understand_hf_questions < max_questions_per_bloom_level:
                 understand_hf_questions += 1
                 spread_questions.append(question)
             elif question[3] == 3 and apply_questions < max_questions_per_bloom_level:
@@ -348,17 +354,16 @@ class OpenQuestionGenerator:
                 create_questions += 1
                 spread_questions.append(question)
 
-
-
-
         #chosen_questions = self.question_list # for debugging
 
         #chosen_questions = random.sample(self.question_list, number_of_questions)
-        if len(spread_questions) <= number_of_questions: # prevent sample error if too few questions
+        if len(spread_questions) <= optimal_number_of_questions: # prevent sample error if too few questions
             chosen_questions = spread_questions
         else:
-            chosen_questions = random.sample(spread_questions, number_of_questions)
+            chosen_questions = random.sample(spread_questions, optimal_number_of_questions)
 
+
+        print("Total questions chosen:", len(chosen_questions))
         questions = []
 
         # make list of dictionaries for json
@@ -412,34 +417,34 @@ class OpenQuestionGenerator:
         return sentence
 
 # not used
-def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
-    # object and subject constants
-    OBJECT_DEPS = {"dobj", "dative", "attr", "oprd"}
-    SUBJECT_DEPS = {"nsubj", "nsubjpass", "csubj", "agent", "expl"}
-    # tags that define wether the word is wh-
-    WH_WORDS = {"WP", "WP$", "WRB"}
-
-    sub = []
-    at = []
-    ve = []
-    for token in doc:
-        # is this a verb?
-        if token.pos_ == "VERB":
-            ve.append(token.text)
-        # is this the object?
-        if token.dep_ in OBJECT_DEPS or token.head.dep_ in OBJECT_DEPS:
-            at.append(token.text)
-        # is this the subject?
-        if token.dep_ in SUBJECT_DEPS or token.head.dep_ in SUBJECT_DEPS:
-            sub.append(token.text)
-
-    print("Subjects: ")
-    print(sub)
-    print("Verbs: ")
-    print(ve)
-    print("Objects: ")
-    print(at)
-    #return " ".join(sub).strip().lower(), " ".join(ve).strip().lower(), " ".join(at).strip().lower()
+# def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
+#     # object and subject constants
+#     OBJECT_DEPS = {"dobj", "dative", "attr", "oprd"}
+#     SUBJECT_DEPS = {"nsubj", "nsubjpass", "csubj", "agent", "expl"}
+#     # tags that define wether the word is wh-
+#     WH_WORDS = {"WP", "WP$", "WRB"}
+#
+#     sub = []
+#     at = []
+#     ve = []
+#     for token in doc:
+#         # is this a verb?
+#         if token.pos_ == "VERB":
+#             ve.append(token.text)
+#         # is this the object?
+#         if token.dep_ in OBJECT_DEPS or token.head.dep_ in OBJECT_DEPS:
+#             at.append(token.text)
+#         # is this the subject?
+#         if token.dep_ in SUBJECT_DEPS or token.head.dep_ in SUBJECT_DEPS:
+#             sub.append(token.text)
+#
+#     print("Subjects: ")
+#     print(sub)
+#     print("Verbs: ")
+#     print(ve)
+#     print("Objects: ")
+#     print(at)
+#     #return " ".join(sub).strip().lower(), " ".join(ve).strip().lower(), " ".join(at).strip().lower()
 
 # from https://betterprogramming.pub/extract-keywords-using-spacy-in-python-4a8415478fbf
 def get_hotwords(text, nlp, number_of_hotwords):
@@ -461,14 +466,14 @@ def get_hotwords(text, nlp, number_of_hotwords):
     return hotwords
 
 # not used
-def get_synonyms(word): # get all synonyms (no domain knowledge)
-
-    synonyms = []
-    for syn in wordnet.synsets(word):
-        for name in syn.lemma_names():
-            print(name)
-            synonyms.append(name)
-
-    return synonyms
+# def get_synonyms(word): # get all synonyms (no domain knowledge)
+#
+#     synonyms = []
+#     for syn in wordnet.synsets(word):
+#         for name in syn.lemma_names():
+#             print(name)
+#             synonyms.append(name)
+#
+#     return synonyms
 
 opinion_vocab = ["opinion", "important", "point of view", "belief", "would say", "impression", "feeling", "doubt", "guess", "conviction", "agree", "disagree", "incorrect", "think", "share the view", "think", "same mind", "one mind", "wrong", "false", "true", "truth", "argument", "debate", "my view", "certain", "convince", "believe", "likely", "unlikely", "generally accepted", "surprise"]

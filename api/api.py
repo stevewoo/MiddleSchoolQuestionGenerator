@@ -5,8 +5,6 @@ from OpenQuestionGenerator import OpenQuestionGenerator
 app = flask.Flask(__name__) # Flask application object
 app.config["DEBUG"] = True
 
-
-
 # test data
 questions = [
     {'question': 'Create: What changes would you make to solve this?',
@@ -42,9 +40,7 @@ def api_from_URL():
 
     url = request.args.get("url")
     print(url)
-
     print("Received: " + str(url))
-
     generator.load_from_URL(str(url))
 
     questions = generator.generate_questions(30)

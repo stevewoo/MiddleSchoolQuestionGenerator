@@ -90,7 +90,7 @@ class OpenQuestionGenerator:
         return(output)
 
     #
-    def generate_questions(self, number_of_questions):
+    def generate_questions(self, max_number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
         nlp = spacy.load("en_core_web_md")
@@ -102,6 +102,12 @@ class OpenQuestionGenerator:
 
         sentences = list(doc.sents)
         print("Number of sentences: " + str(len(sentences)))
+
+        optimal_number_of_questions = round(len(sentences)/5)
+
+        if optimal_number_of_questions > max_number_of_questions:
+            optimal_number_of_questions = max_number_of_questions
+
 
         # get topic(s)
         print("Hot words:")
@@ -320,19 +326,19 @@ class OpenQuestionGenerator:
         evaluate_questions = 0
         create_questions = 0
 
-        max_questions_per_bloom_level = 10
+        max_questions_per_bloom_level = round(optimal_number_of_questions / 7)
 
         spread_questions = []
 
         for question in self.question_list:
 
-            if question[3] == 1 and remember_questions < 5:
+            if question[3] == 1 and remember_questions < max_questions_per_bloom_level:
                 remember_questions += 1
                 spread_questions.append(question)
             elif question[3] == 2 and understand_questions < max_questions_per_bloom_level:
                 understand_questions += 1
                 spread_questions.append(question)
-            elif question[3] == 2.5 and understand_hf_questions < 10:
+            elif question[3] == 2.5 and understand_hf_questions < max_questions_per_bloom_level:
                 understand_hf_questions += 1
                 spread_questions.append(question)
             elif question[3] == 3 and apply_questions < max_questions_per_bloom_level:
@@ -348,17 +354,16 @@ class OpenQuestionGenerator:
                 create_questions += 1
                 spread_questions.append(question)
 
-
-
-
         #chosen_questions = self.question_list # for debugging
 
         #chosen_questions = random.sample(self.question_list, number_of_questions)
-        if len(spread_questions) <= number_of_questions: # prevent sample error if too few questions
+        if len(spread_questions) <= optimal_number_of_questions: # prevent sample error if too few questions
             chosen_questions = spread_questions
         else:
-            chosen_questions = random.sample(spread_questions, number_of_questions)
+            chosen_questions = random.sample(spread_questions, optimal_number_of_questions)
 
+
+        print("Total questions chosen:", len(chosen_questions))
         questions = []
 
         # make list of dictionaries for json
