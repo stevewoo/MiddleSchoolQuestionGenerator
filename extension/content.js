@@ -60,8 +60,7 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         // text = el.innerHTML;
 
-        text = document.querySelectorAll("section");
-
+        text = document.querySelectorAll("section, p, article");
 
         tooltip_text = "<div><strong>"+ bloom_level +"</strong></div>" + question;
 

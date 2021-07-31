@@ -1,18 +1,25 @@
 // from https://www.youtube.com/watch?v=Aw3G2jR-5IM
 
-const server = "http://127.0.0.1:5000/";
+const server = "https://questionv2-yk4rgxamaa-ts.a.run.app/";
 
-var questions = [];
+//var questions = [];
 
-function showQuestions() {
-//  var temperatures = [59.2, 60.1, 63, 65, 62].map(function (t, i) {
-//    return 'The temperature at ' + (i || 'noon') + ' was ' + t
-//  })
+//function showQuestions() {
+////  var temperatures = [59.2, 60.1, 63, 65, 62].map(function (t, i) {
+////    return 'The temperature at ' + (i || 'noon') + ' was ' + t
+////  })
+//
+//    // from https://stackoverflow.com/questions/43567079/simpler-way-to-print-array-items-into-list-items-javascript
+//    document.getElementById('questions').innerHTML =
+//    '<li>' + questions.join('</li><li>') + '</li>';
+//}
 
-    // from https://stackoverflow.com/questions/43567079/simpler-way-to-print-array-items-into-list-items-javascript
-    document.getElementById('questions').innerHTML =
-    '<li>' + questions.join('</li><li>') + '</li>';
-}
+//chrome.browserAction.onClicked.addListener(function(tab) { alert('icon clicked')});
+
+
+//chrome.browserAction.onClicked.addListener(function(tab) {
+//    alert('working?');
+//});
 
 
 // listen for messages
@@ -62,6 +69,8 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
     return true;
 
 });
+
+
 
 //
 //    const questions = [

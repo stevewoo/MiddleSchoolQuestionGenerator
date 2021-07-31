@@ -49,9 +49,11 @@ class OpenQuestionGenerator:
         scraped_data = urllib.request.urlopen(URL)
         article = scraped_data.read()
 
-        parsed_article = bs.BeautifulSoup(article,'lxml')
+        parsed_article = bs.BeautifulSoup(article, 'lxml')
 
-        paragraphs = parsed_article.find_all('section')
+        paragraphs = parsed_article.find_all('p') # parsed_article.find_all('section' 'p')
+        paragraphs += parsed_article.find_all('section')
+        paragraphs += parsed_article.find_all('article')
 
         article_text = ""
 
@@ -361,7 +363,7 @@ class OpenQuestionGenerator:
             elif question[3] == 2 and understand_questions < max_questions_per_bloom_level:
                 understand_questions += 1
                 spread_questions.append(question)
-            elif question[3] == 2.5 and understand_hf_questions < 15:
+            elif question[3] == 2.5 and understand_hf_questions < 10:
                 understand_hf_questions += 1
                 spread_questions.append(question)
             elif question[3] == 3 and apply_questions < max_questions_per_bloom_level:

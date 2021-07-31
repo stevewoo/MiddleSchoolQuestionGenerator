@@ -2,8 +2,6 @@ import flask
 from flask import request, jsonify
 from OpenQuestionGenerator import OpenQuestionGenerator
 
-
-
 app = flask.Flask(__name__) # Flask application object
 app.config["DEBUG"] = True
 
