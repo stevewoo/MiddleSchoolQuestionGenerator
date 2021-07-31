@@ -1,17 +1,17 @@
 import random
-import string
-import nltk
-from nltk import pos_tag
-#nltk.download('averaged_perceptron_tagger')
-from nltk import RegexpParser
-import re
+# import string
+# import nltk
+# from nltk import pos_tag
+# #nltk.download('averaged_perceptron_tagger')
+# from nltk import RegexpParser
+# import re
 import spacy
 from spacy.util import filter_spans
 from spacy.matcher import Matcher
 from spacy.tokenizer import Tokenizer
-from spacy.attrs import POS
+# from spacy.attrs import POS
 from collections import Counter
-from spacy_wordnet.wordnet_annotator import WordnetAnnotator
+# from spacy_wordnet.wordnet_annotator import WordnetAnnotator
 from nltk.corpus import wordnet
 
 from wordfreq import word_frequency
@@ -19,7 +19,7 @@ from wordfreq import word_frequency
 import bs4 as bs
 import urllib.request
 import re
-import json
+# import json
 from transformers import T5Config, T5ForConditionalGeneration, T5Tokenizer
 
 class OpenQuestionGenerator:
@@ -49,24 +49,28 @@ class OpenQuestionGenerator:
         scraped_data = urllib.request.urlopen(URL)
         article = scraped_data.read()
 
-        parsed_article = bs.BeautifulSoup(article,'lxml')
+        parsed_article = bs.BeautifulSoup(article, 'lxml')
 
-        paragraphs = parsed_article.find_all('p')
+        # get the main text
+        paragraphs = parsed_article.find_all('p') # parsed_article.find_all('section' 'p')
+        paragraphs += parsed_article.find_all('section')
+        paragraphs += parsed_article.find_all('article')
 
         article_text = ""
 
         for p in paragraphs:
             article_text += p.text
 
-        # Removing Square Brackets and Extra Spaces in wikipedia pages
+        # removing Square Brackets and Extra Spaces in wikipedia pages
         article_text = re.sub(r'\[[0-9]*\]', ' ', article_text)
         article_text = re.sub(r'\s+', ' ', article_text)
 
         self.text = article_text
 
-    def add_question(self, question_text, target_text, sentence_number, allow_duplicate):
+    # add question to list of questions to choose from
+    def add_question(self, bloom_level, question_text, target_text, sentence_number, allow_duplicate):
 
-        question = (question_text, target_text, sentence_number)
+        question = (question_text, target_text, sentence_number, bloom_level)
 
         # if uncustomised without article words, allow duplicates
         if allow_duplicate:
@@ -77,21 +81,7 @@ class OpenQuestionGenerator:
             self.question_set.add(question_text)
             self.question_list.append(question)
 
-    def test_me(self):
-
-        print("Tester!")
-
-
-
-
-        # get all synonyms (no domain knowledge)
-        # for syn in wordnet.synsets("good"):
-        #     for name in syn.lemma_names():
-        #         print(name)
-
-        # Load an spacy model (you need to download the spacy pt model)
-        #nlp = spacy.load("en_core_web_md")
-
+    # get Understand questions from transformer
     def run_model(self, input_string, **generator_args):
         input_ids = self.tokenizer.encode(input_string, return_tensors="pt")
         res = self.model.generate(input_ids, **generator_args)
@@ -99,6 +89,7 @@ class OpenQuestionGenerator:
         #print(output)
         return(output)
 
+    #
     def generate_questions(self, number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
@@ -106,11 +97,8 @@ class OpenQuestionGenerator:
         doc = nlp(self.text)
         tokenizer = Tokenizer(nlp.vocab)
 
+        # for marking difficult / infrequently seen words
         vocab_difficulty_threshold = 0.000007
-
-
-
-        #self.add_question("Understand: Is this a sample question?", "Sample target", 0, False)
 
         sentences = list(doc.sents)
         print("Number of sentences: " + str(len(sentences)))
@@ -118,8 +106,6 @@ class OpenQuestionGenerator:
         # get topic(s)
         print("Hot words:")
         hot_words = get_hotwords(self.text, nlp, 5)
-
-        #sentences = [sentences[0], sentences[1], sentences[2]] # for debugging
 
         # generate question for each sentence
         for sentence_number in range(len(sentences)):
@@ -133,28 +119,28 @@ class OpenQuestionGenerator:
 
 
             # only do every n sentence to improve speed
-            # ai question generator from
+            ### ai question generator from
             # https://huggingface.co/allenai/t5-small-squad2-question-generation/blob/main/README.md
             if sentence_number % 10 == 0:
 
-                print("Hugging face:")
+                #print("Hugging face:")
 
                 # remove brackets
                 #sentence = sentence.replace('(','').replace(')','')
-                print(sentence)
+                #print(sentence)
                 question = self.run_model(str(sentence))
 
-                question = "Understand: " + question[0] # is this safe?
+                question = "Understand: " + question[0] # TODO is this safe?
                 print(question)
                 question_target = str(sentence)
-                self.add_question(question, question_target, sentence_number, False)
+                self.add_question(2.5, question, question_target, sentence_number, False) # 2.5 to distinguish from normal understand questions
 
             noun_phrases = [chunk for chunk in sentence.noun_chunks] # was [chunk.text for chunk in sentence.noun_chunks]
 
             # for token in sentence:
             #     print(token.text, token.lemma_, token.pos_, token.tag_, token.dep_, token.shape_, token.is_alpha, token.is_stop)
 
-            # define / decribe main concepts
+            ### define / decribe main concepts
             for hot_word in hot_words:
                 for noun_phrase in noun_phrases:
                     if hot_word in noun_phrase.text:
@@ -162,19 +148,19 @@ class OpenQuestionGenerator:
                         #print(hot_word + " is found in nounphrase:" + noun_phrase)
                         question = "Understand: How would you define `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(2, question, question_target, sentence_number, False)
 
                         question = "Understand: How would you describe `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(2, question, question_target, sentence_number, False)
 
                         question = "Understand: How would you explain `" + noun_phrase.text + "`?"
                         question_target = noun_phrase
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(2, question, question_target, sentence_number, False)
 
                         question = "Understand: What does `" + noun_phrase.text + "` mean?"
                         question_target = noun_phrase
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(2, question, question_target, sentence_number, False)
 
             # define difficult words
             difficult_words = []
@@ -185,31 +171,15 @@ class OpenQuestionGenerator:
                     if word_frequency(token.lemma_, 'en') < vocab_difficulty_threshold:
                         difficult_words.append(token)
 
-            # print("Difficult words:")
-            # print(difficult_words)
+            # print("Difficult words:", difficult_words)
             for token in difficult_words:
+
                 question = "Understand: What is the meaning of the word " + token.text + "?"
+
                 question_target = token.text
-                self.add_question(question, question_target, sentence_number, False)
+                self.add_question(2, question, question_target, sentence_number, False)
 
-            # compare / relations - one (with wordnet) # https://pypi.org/project/spacy-wordnet/
-            #sentence = self.get_synonyms(nlp, sentence)
-
-            # extract nouns
-            # nouns = []
-            #
-            # for token in sentence: # collect nouns
-            #     if token.pos_ == "NOUN":
-            #         nouns.append(token)
-            #
-            # for hot_word in hot_words:
-            #     for noun_b in nouns:
-            #         if hot_word != noun_b.text:
-            #             question = "Analyse: What is the connection between " + hot_word + " and " + noun_b.text +"?"
-            #             question_target = str(sentence)
-            #             self.add_question(question, question_target, sentence_number, False)
-
-            # entity questions
+            ### entity questions
             # extract named entities: locations, persons, organisations
             org = None
             person = None
@@ -221,33 +191,33 @@ class OpenQuestionGenerator:
                 if entity.label_ == "LOC":
                     question = "Remember: Where is " + entity.text + "?"
                     question_target = entity.text
-                    self.add_question(question, question_target, sentence_number, False)
+                    self.add_question(1, question, question_target, sentence_number, False)
 
                     question = "Remember: Have you ever been to " + entity.text + "?"
                     question_target = entity.text
-                    self.add_question(question, question_target, sentence_number, False)
+                    self.add_question(1, question, question_target, sentence_number, False)
 
                 # Persons
                 elif entity.label_ == "PERSON":
 
                     question = "Remember: Who is " + entity.text + "?"
                     question_target = entity.text
-                    self.add_question(question, question_target, sentence_number, False)
+                    self.add_question(1, question, question_target, sentence_number, False)
 
                     question = "Apply: What questions would you ask " + entity.text + "?"
                     question_target = entity.text
-                    self.add_question(question, question_target, sentence_number, False)
+                    self.add_question(3, question, question_target, sentence_number, False)
 
                     if org:
                         question = "Analyse: What is the relationship between " + entity.text + " and " + org.text + "?"
                         question_target = entity.text
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(4, question, question_target, sentence_number, False)
 
 
                     if person and person.text not in entity.text:
                         question = "Analyse: Describe the relationship between " + person.text + " and " + entity.text + "?"
                         question_target = entity.text
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(4, question, question_target, sentence_number, False)
 
                     person = entity # store for next person / org
 
@@ -256,16 +226,16 @@ class OpenQuestionGenerator:
 
                     question = "Understand: What are the goals of " + entity.text + "?"
                     question_target = entity.text
-                    self.add_question(question, question_target, sentence_number, False)
+                    self.add_question(2, question, question_target, sentence_number, False)
 
                     if person:
                         question = "Analyse: Describe the relationship between " + person.text + " and " + entity.text + "?"
                         question_target = entity.text
-                        self.add_question(question, question_target, sentence_number, False)
+                        self.add_question(4, question, question_target, sentence_number, False)
 
                     org = entity # store it for next person
 
-            # specific keywords
+            ### specific keywords
 
             # problem / issue / dilemma / crisis
             problem_keywords = ["problem", "issue", "crisis", "dilemma"]
@@ -275,33 +245,39 @@ class OpenQuestionGenerator:
 
                     question = "Create: What would you suggest to solve this?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(6, question, question_target, sentence_number, True)
 
                     question = "Create: What possible solutions do you see here?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(6, question, question_target, sentence_number, True)
 
                     question = "Create: What changes would you make to solve this?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(6, question, question_target, sentence_number, True)
 
             # desire / want to / trying to
             if "want" in str(sentence) or "desire" in str(sentence) or "trying to" in str(sentence):
                 question = "Analyse: What could be the motivation here?"
                 question_target = str(sentence)
-                self.add_question(question, question_target, sentence_number, True)
+                self.add_question(4, question, question_target, sentence_number, True)
 
             # solution
             if "solution" in str(sentence) or "solve" in str(sentence) or "fix" in str(sentence):
                 question = "Evaluate: What are the alternatives?"
                 question_target = str(sentence)
-                self.add_question(question, question_target, sentence_number, True)
+                self.add_question(5, question, question_target, sentence_number, True)
 
             # due to
             if "due to" in str(sentence):
                 question = "Analyse: What other reasons can you think of?"
                 question_target = str(sentence)
-                self.add_question(question, question_target, sentence_number, True)
+                self.add_question(4, question, question_target, sentence_number, True)
+
+            # process
+            if "process" in str(sentence) or "development" in str(sentence) or "method" in str(sentence) or "technique" in str(sentence):
+                question = "Create: How would you demonstrate this?"
+                question_target = str(sentence)
+                self.add_question(4, question, question_target, sentence_number, True)
 
             # because
             for token in sentence:
@@ -309,7 +285,7 @@ class OpenQuestionGenerator:
                 if lower_token == "because":
                     question = "Analyse: What other reasons can you think of?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(4, question, question_target, sentence_number, True)
 
             # opinion language
             for opinion_phrase in opinion_vocab:
@@ -317,25 +293,71 @@ class OpenQuestionGenerator:
 
                     question = "Evaluate: Do you believe this? Why or why not?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(5, question, question_target, sentence_number, True)
 
                     question = "Evaluate: Is this fact or opinion?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(5, question, question_target, sentence_number, True)
 
                     question = "Evaluate: How could you verify this?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(5, question, question_target, sentence_number, True)
 
                     question = "Evaluate: What is the evidence supporting this?"
                     question_target = str(sentence)
-                    self.add_question(question, question_target, sentence_number, True)
+                    self.add_question(5, question, question_target, sentence_number, True)
 
         print("Total questions generated: " + str(len(self.question_list)))
 
-        chosen_questions = self.question_list # for debugging
+        random.shuffle(self.question_list) # so not just first sentences
 
-        chosen_questions = random.sample(self.question_list, number_of_questions)
+        # try to even out bloom levels
+        remember_questions = 0
+        understand_questions = 0
+        understand_hf_questions = 0
+        apply_questions = 0
+        analyse_questions = 0
+        evaluate_questions = 0
+        create_questions = 0
+
+        max_questions_per_bloom_level = 10
+
+        spread_questions = []
+
+        for question in self.question_list:
+
+            if question[3] == 1 and remember_questions < 5:
+                remember_questions += 1
+                spread_questions.append(question)
+            elif question[3] == 2 and understand_questions < max_questions_per_bloom_level:
+                understand_questions += 1
+                spread_questions.append(question)
+            elif question[3] == 2.5 and understand_hf_questions < 10:
+                understand_hf_questions += 1
+                spread_questions.append(question)
+            elif question[3] == 3 and apply_questions < max_questions_per_bloom_level:
+                apply_questions += 1
+                spread_questions.append(question)
+            elif question[3] == 4 and analyse_questions < max_questions_per_bloom_level:
+                analyse_questions += 1
+                spread_questions.append(question)
+            elif question[3] == 5 and evaluate_questions < max_questions_per_bloom_level:
+                evaluate_questions += 1
+                spread_questions.append(question)
+            elif question[3] == 6 and create_questions < max_questions_per_bloom_level:
+                create_questions += 1
+                spread_questions.append(question)
+
+
+
+
+        #chosen_questions = self.question_list # for debugging
+
+        #chosen_questions = random.sample(self.question_list, number_of_questions)
+        if len(spread_questions) <= number_of_questions: # prevent sample error if too few questions
+            chosen_questions = spread_questions
+        else:
+            chosen_questions = random.sample(spread_questions, number_of_questions)
 
         questions = []
 
@@ -346,20 +368,11 @@ class OpenQuestionGenerator:
 
             question = chosen_questions[i]
 
-            question_dict["question"] = str(question[0])#.replace("'", '"')
-            question_dict["target"] = str(question[1])#.replace("'", '"')
-            #question_dict["sentence_number"] = str("\"" + question[2] + "\"")
-
-            # question_dict["question"] = question[0]
-            # question_dict["target"] = question[1]
+            question_dict["question"] = str(question[0])
+            question_dict["target"] = str(question[1])
             question_dict["sentence_number"] = question[2]
 
-            print(question_dict)
-
             questions.append(question_dict)
-
-
-
 
         #print(questions)
 
@@ -398,6 +411,7 @@ class OpenQuestionGenerator:
         print(' '.join(enriched_sentence))
         return sentence
 
+# not used
 def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
     # object and subject constants
     OBJECT_DEPS = {"dobj", "dative", "attr", "oprd"}
@@ -427,7 +441,6 @@ def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/
     print(at)
     #return " ".join(sub).strip().lower(), " ".join(ve).strip().lower(), " ".join(at).strip().lower()
 
-
 # from https://betterprogramming.pub/extract-keywords-using-spacy-in-python-4a8415478fbf
 def get_hotwords(text, nlp, number_of_hotwords):
     result = []
@@ -447,6 +460,7 @@ def get_hotwords(text, nlp, number_of_hotwords):
 
     return hotwords
 
+# not used
 def get_synonyms(word): # get all synonyms (no domain knowledge)
 
     synonyms = []
@@ -457,46 +471,4 @@ def get_synonyms(word): # get all synonyms (no domain knowledge)
 
     return synonyms
 
-opinion_vocab = ["opinion", "important", "point of view", "belief", "would say", "impression", "feeling", "doubt", "guess", "conviction", "agree", "disagree", "incorrect", "think", "share the view", "think", "same mind", "one mind", "wrong", "false", "true", "truth", "argument", "debate", "my view", "certain", "convince", "believe", "likely", "unlikely", "generally accepted"]
-
-def old_stuff():
-    # Analyze syntax
-    print("Noun phrases:", [chunk.text for chunk in doc.noun_chunks])
-    print("Verbs:", [token.lemma_ for token in doc if token.pos_ == "VERB"])
-
-    patterns=[{'POS': 'VERB', 'OP': '?'},
-     {'POS': 'ADV', 'OP': '*'},
-     #{'OP': '*'}, # additional wildcard - match any text in between
-     {'POS': 'VERB', 'OP': '+'}]
-
-    # instantiate a Matcher instance
-    matcher = Matcher(nlp.vocab)
-    matcher.add("Verb phrase", [patterns])
-
-    # call the matcher to find matches
-    matches = matcher(doc)
-    spans = [doc[start:end] for _, start, end in matches]
-
-    print("Verb phrases: ")
-    print(filter_spans(spans))
-
-    extract_svo(doc)
-
-    # Find named entities, phrases and concepts
-    for entity in doc.ents:
-        print(entity.text, entity.label_)
-
-    # tokens_tag = pos_tag(text)
-    # print("After Token:",tokens_tag)
-    #patterns= """mychunk:{<NN.?>*<VBD.?>*<JJ.?>*<CC>?}"""
-    #chunker = RegexpParser(patterns)
-    #print("After Regex:",chunker)
-    #output = chunker.parse(tokens_tag)
-    #print("After Chunking",output)
-    # print(tokens_tag)
-
-    # split_sentence = ['This', 'is', 'a', 'sample', 'sentence']
-    # tag = nltk.pos_tag(split_sentence)
-    # print(tag)
-
-    #Output: [('This', 'DT'), ('is', 'VBZ'), ('a', 'DT'), ('sample', 'JJ'), ('sentence', 'NN')]
+opinion_vocab = ["opinion", "important", "point of view", "belief", "would say", "impression", "feeling", "doubt", "guess", "conviction", "agree", "disagree", "incorrect", "think", "share the view", "think", "same mind", "one mind", "wrong", "false", "true", "truth", "argument", "debate", "my view", "certain", "convince", "believe", "likely", "unlikely", "generally accepted", "surprise"]
