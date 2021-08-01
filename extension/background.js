@@ -2,22 +2,9 @@
 
 const server = "https://questionv2-yk4rgxamaa-ts.a.run.app/";
 
-//chrome.action.onClicked.addListener(tab => { alert('working?'); });
-//
-//function changeIcon(){
-//    chrome.action.setIcon({ path: "imgs/icon16_gray.png" });
-//}
-//
-//
-//chrome.action.onClicked.addListener((tab) => {
-//    chrome.scripting.executeScript({
-//        target: { tabId: tab.id },
-//        function: changeIcon
-//  });
-//});
-
 var clicked = false;
 
+// toggle icon on and off
 chrome.action.onClicked.addListener(function (tab) {
     clicked = !clicked;
 
@@ -31,19 +18,7 @@ chrome.action.onClicked.addListener(function (tab) {
     else{
         chrome.action.setIcon({path: "imgs/icon16_off.png", tabId:tab.id});
     }
-
-//    chrome.action.setIcon({ path: "imgs/icon16_gray.png" });
-//    chrome.action.setBadgeBackgroundColor({
-//        color: '#ff1919'
-//    });
-
-
 });
-
-//if( clicked){
-//    chrome.action.setIcon({ path: "imgs/icon16_gray.png" });
-//}
-
 
 // listen for messages
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
@@ -54,9 +29,7 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
         chrome.tabs.query({active: true, lastFocusedWindow: true}, tabs => {
 
             let url = tabs[0].url; // use `url` here inside the callback because it's asynchronous!
-
             const apiCall = server + "api/get_sentences?url=" + url;
-
             console.log(apiCall);
 
             // call api
@@ -70,14 +43,11 @@ chrome.runtime.onMessage.addListener((msg, sender, response) => {
 
                     response(data);
                     console.log(data);
-
                 });
             }).catch(function(err) {
                 response({question: 'Error - no question', target: "Error - no target", sentence_number: "Error - no sentence number"});
             });
         });
-
     }
     return true;
-
 });

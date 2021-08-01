@@ -3,9 +3,9 @@
 // send message To background.js
 chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
-  // wait for Response
-    console.log("Response in content.js");
-    console.log(response);
+    // wait for Response
+    console.log("Questions from API");
+    // console.log(response);
 
     var previously_targetted = []
 
@@ -28,14 +28,15 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
 
         var split_on_colon = question.split(":");
 
-        // get the bloom level and question out
+        // get the Bloom level and question out
         var bloom_level = split_on_colon[0];
         question = split_on_colon[1];
 
-        var el = document.body; // getElementById('mytext');
+        var el = document.body;
         text = document.querySelectorAll("section, p, article"); // tags with the main text
         tooltip_text = "<div><strong>"+ bloom_level +"</strong></div>" + question;
 
+        // for each html tag specified above
         for (let j = 0; j < text.length; j++) {
 
             let tag = text[j].tagName;
@@ -43,6 +44,7 @@ chrome.runtime.sendMessage({name: "fetchQuestions"}, (response) => {
             p_text = p_text.replace(/[[0-9]+]+/g, ""); // remove wiki references
             // console.log(p_text); // after reference removal
 
+            // if sentence contains the target
             if (p_text.toLowerCase().includes(target.toLowerCase())){
 
                 // add the question as a tooltip
