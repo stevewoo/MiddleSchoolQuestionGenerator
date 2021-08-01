@@ -5,7 +5,8 @@
     "description": "Generate questions based on text",
     "action": {},
     "icons": {
-        "16": "imgs/icon16.png"
+        "128": "imgs/icon16_on.png",
+        "128": "imgs/icon16_off.png"
     },
     "permissions": [
         "tabs",
@@ -20,6 +21,10 @@
     "host_permissions": [
         "<all_urls>"
     ],
+    "action": {
+        "default_icon": "imgs/icon16_off.png",
+        "default_title": "icon"
+    },
     "content_scripts": [
         {
             "matches": [
@@ -27,7 +32,7 @@
                 "*://*.repl.co/"
             ],
             "js": [
-                "content.js"
+                "runner.js"
             ],
             "css":        ["tooltip.css"]
         }

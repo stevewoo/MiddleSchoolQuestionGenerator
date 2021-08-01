@@ -16,6 +16,35 @@ const server = "https://questionv2-yk4rgxamaa-ts.a.run.app/";
 //  });
 //});
 
+var clicked = false;
+
+chrome.action.onClicked.addListener(function (tab) {
+    clicked = !clicked;
+
+    if(clicked){
+        chrome.action.setIcon({path: "imgs/icon16_on.png", tabId:tab.id});
+        chrome.scripting.executeScript({
+                target: {tabId: tab.id},
+                files: ['content.js'],
+        });
+    }
+    else{
+        chrome.action.setIcon({path: "imgs/icon16_off.png", tabId:tab.id});
+    }
+
+//    chrome.action.setIcon({ path: "imgs/icon16_gray.png" });
+//    chrome.action.setBadgeBackgroundColor({
+//        color: '#ff1919'
+//    });
+
+
+});
+
+//if( clicked){
+//    chrome.action.setIcon({ path: "imgs/icon16_gray.png" });
+//}
+
+
 // listen for messages
 chrome.runtime.onMessage.addListener((msg, sender, response) => {
 
