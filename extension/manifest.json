@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Open Question Generator",
-    "version": "0.3",
+    "version": "0.0.3",
     "description": "Generate questions based on text",
     "action": {},
     "icons": {
@@ -26,9 +26,6 @@
         {
             "matches": [
                 "<all_urls>"
-            ],
-            "js": [
-                "runner.js"
             ],
             "css": [
                 "tooltip.css"
