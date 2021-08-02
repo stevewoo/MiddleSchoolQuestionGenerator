@@ -1,17 +1,7 @@
 import random
-# import string
-# import nltk
-# from nltk import pos_tag
-# #nltk.download('averaged_perceptron_tagger')
-# from nltk import RegexpParser
-# import re
 import spacy
-from spacy.util import filter_spans
-from spacy.matcher import Matcher
 from spacy.tokenizer import Tokenizer
-# from spacy.attrs import POS
 from collections import Counter
-# from spacy_wordnet.wordnet_annotator import WordnetAnnotator
 from nltk.corpus import wordnet
 
 from wordfreq import word_frequency
@@ -19,7 +9,6 @@ from wordfreq import word_frequency
 import bs4 as bs
 import urllib.request
 import re
-# import json
 from transformers import T5Config, T5ForConditionalGeneration, T5Tokenizer
 
 class OpenQuestionGenerator:
@@ -89,7 +78,6 @@ class OpenQuestionGenerator:
         #print(output)
         return(output)
 
-    #
     def generate_questions(self, max_number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
@@ -108,7 +96,6 @@ class OpenQuestionGenerator:
         if optimal_number_of_questions > max_number_of_questions:
             optimal_number_of_questions = max_number_of_questions
 
-
         # get topic(s)
         print("Hot words:")
         hot_words = get_hotwords(self.text, nlp, 5)
@@ -118,7 +105,6 @@ class OpenQuestionGenerator:
 
             sentence = sentences[sentence_number]
             sentence_no_stop_no_punct = [token for token in sentence if not (token.is_stop or token.is_punct)]
-            #sentence_no_punct = [token for token in sentence if not token.is_punct]
             tokens = tokenizer(str(sentence))
             #print("Tokens: " + str(list(tokens)))
             #print("\n" + str(sentence))
@@ -416,7 +402,7 @@ class OpenQuestionGenerator:
         print(' '.join(enriched_sentence))
         return sentence
 
-# not used
+# TODO
 def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
     # object and subject constants
     OBJECT_DEPS = {"dobj", "dative", "attr", "oprd"}
@@ -465,7 +451,7 @@ def get_hotwords(text, nlp, number_of_hotwords):
 
     return hotwords
 
-# not used
+# TODO
 def get_synonyms(word): # get all synonyms (no domain knowledge)
 
     synonyms = []

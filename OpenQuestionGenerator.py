@@ -1,17 +1,7 @@
 import random
-# import string
-# import nltk
-# from nltk import pos_tag
-# #nltk.download('averaged_perceptron_tagger')
-# from nltk import RegexpParser
-# import re
 import spacy
-from spacy.util import filter_spans
-from spacy.matcher import Matcher
 from spacy.tokenizer import Tokenizer
-# from spacy.attrs import POS
 from collections import Counter
-# from spacy_wordnet.wordnet_annotator import WordnetAnnotator
 from nltk.corpus import wordnet
 
 from wordfreq import word_frequency
@@ -19,7 +9,6 @@ from wordfreq import word_frequency
 import bs4 as bs
 import urllib.request
 import re
-# import json
 from transformers import T5Config, T5ForConditionalGeneration, T5Tokenizer
 
 class OpenQuestionGenerator:
@@ -89,7 +78,6 @@ class OpenQuestionGenerator:
         #print(output)
         return(output)
 
-    #
     def generate_questions(self, max_number_of_questions):
 
         # Load English tokenizer, tagger, parser and NER
@@ -108,7 +96,6 @@ class OpenQuestionGenerator:
         if optimal_number_of_questions > max_number_of_questions:
             optimal_number_of_questions = max_number_of_questions
 
-
         # get topic(s)
         print("Hot words:")
         hot_words = get_hotwords(self.text, nlp, 5)
@@ -118,7 +105,6 @@ class OpenQuestionGenerator:
 
             sentence = sentences[sentence_number]
             sentence_no_stop_no_punct = [token for token in sentence if not (token.is_stop or token.is_punct)]
-            #sentence_no_punct = [token for token in sentence if not token.is_punct]
             tokens = tokenizer(str(sentence))
             #print("Tokens: " + str(list(tokens)))
             #print("\n" + str(sentence))
@@ -416,35 +402,35 @@ class OpenQuestionGenerator:
         print(' '.join(enriched_sentence))
         return sentence
 
-# not used
-# def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
-#     # object and subject constants
-#     OBJECT_DEPS = {"dobj", "dative", "attr", "oprd"}
-#     SUBJECT_DEPS = {"nsubj", "nsubjpass", "csubj", "agent", "expl"}
-#     # tags that define wether the word is wh-
-#     WH_WORDS = {"WP", "WP$", "WRB"}
-#
-#     sub = []
-#     at = []
-#     ve = []
-#     for token in doc:
-#         # is this a verb?
-#         if token.pos_ == "VERB":
-#             ve.append(token.text)
-#         # is this the object?
-#         if token.dep_ in OBJECT_DEPS or token.head.dep_ in OBJECT_DEPS:
-#             at.append(token.text)
-#         # is this the subject?
-#         if token.dep_ in SUBJECT_DEPS or token.head.dep_ in SUBJECT_DEPS:
-#             sub.append(token.text)
-#
-#     print("Subjects: ")
-#     print(sub)
-#     print("Verbs: ")
-#     print(ve)
-#     print("Objects: ")
-#     print(at)
-#     #return " ".join(sub).strip().lower(), " ".join(ve).strip().lower(), " ".join(at).strip().lower()
+# TODO
+def extract_svo(doc): # from https://github.com/Dimev/Spacy-SVO-extraction/blob/master/main.py
+    # object and subject constants
+    OBJECT_DEPS = {"dobj", "dative", "attr", "oprd"}
+    SUBJECT_DEPS = {"nsubj", "nsubjpass", "csubj", "agent", "expl"}
+    # tags that define wether the word is wh-
+    WH_WORDS = {"WP", "WP$", "WRB"}
+
+    sub = []
+    at = []
+    ve = []
+    for token in doc:
+        # is this a verb?
+        if token.pos_ == "VERB":
+            ve.append(token.text)
+        # is this the object?
+        if token.dep_ in OBJECT_DEPS or token.head.dep_ in OBJECT_DEPS:
+            at.append(token.text)
+        # is this the subject?
+        if token.dep_ in SUBJECT_DEPS or token.head.dep_ in SUBJECT_DEPS:
+            sub.append(token.text)
+
+    print("Subjects: ")
+    print(sub)
+    print("Verbs: ")
+    print(ve)
+    print("Objects: ")
+    print(at)
+    #return " ".join(sub).strip().lower(), " ".join(ve).strip().lower(), " ".join(at).strip().lower()
 
 # from https://betterprogramming.pub/extract-keywords-using-spacy-in-python-4a8415478fbf
 def get_hotwords(text, nlp, number_of_hotwords):
@@ -465,15 +451,15 @@ def get_hotwords(text, nlp, number_of_hotwords):
 
     return hotwords
 
-# not used
-# def get_synonyms(word): # get all synonyms (no domain knowledge)
-#
-#     synonyms = []
-#     for syn in wordnet.synsets(word):
-#         for name in syn.lemma_names():
-#             print(name)
-#             synonyms.append(name)
-#
-#     return synonyms
+# TODO
+def get_synonyms(word): # get all synonyms (no domain knowledge)
+
+    synonyms = []
+    for syn in wordnet.synsets(word):
+        for name in syn.lemma_names():
+            print(name)
+            synonyms.append(name)
+
+    return synonyms
 
 opinion_vocab = ["opinion", "important", "point of view", "belief", "would say", "impression", "feeling", "doubt", "guess", "conviction", "agree", "disagree", "incorrect", "think", "share the view", "think", "same mind", "one mind", "wrong", "false", "true", "truth", "argument", "debate", "my view", "certain", "convince", "believe", "likely", "unlikely", "generally accepted", "surprise"]
