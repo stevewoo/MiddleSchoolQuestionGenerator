@@ -14,6 +14,7 @@ chrome.action.onClicked.addListener(function (tab) {
                 target: {tabId: tab.id},
                 files: ['content.js'],
         });
+        alert("Downloading questions... this will take a moment.");
     }
     else{
         chrome.action.setIcon({path: "imgs/icon16_off.png", tabId:tab.id});
